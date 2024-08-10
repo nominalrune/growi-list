@@ -1,78 +1,68 @@
 import * as vscode from 'vscode';
-import ContentItem from './ContentItem';
+import RootNode from './RootNode';
 import GrowiAPI from '../GrowiAPI/GrowiAPI';
 import getToken from '../Token/getToken';
-import Node from '../GrowiAPI/Node';
-import { Change } from '../GrowiAPI/Change';
-export default class DocumentContentProvider implements vscode.TreeDataProvider<ContentItem> {
-	private _onDidChangeTreeData = new vscode.EventEmitter<ContentItem | undefined | void>();
+import PageContent from '../GrowiAPI/PageContent';
+// @ts-expect-error esm module error
+import {remark} from 'remark';
+export default class PageContentProvider implements vscode.TreeDataProvider<RootNode> {
+	private _onDidChangeTreeData = new vscode.EventEmitter<RootNode | undefined | void>();
 	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
-	private changes: Change[] = [];
-	public documentId: string = '';
+	public path: string = '';
 	private api: GrowiAPI;
-	public content: Node[];
-	private interval_id;
+	private hasChanged = false;
+	public page: PageContent | undefined;
+	public content: VFile | undefined;
+	// private parser:typeof remark|undefined;
+	// async import(){
+	// 	this.parser=(await import('remark')).remark;
+	// }
 	constructor(private context: vscode.ExtensionContext) {
 		this.api = new GrowiAPI(this.context);
-		this.content = [];
-		this.interval_id = setInterval(() => {
-			if (this.changes.length > 0) {
-				this.saveChanges();
-			}
-		}, 15000);
 		console.log('DocumentContentProvider created', {
 			api: this.api,
-			content: this.content,
-			interval_id: this.interval_id,
 		});
+
 	}
 	dispose() {
 		this.saveChanges();
-		clearInterval(this.interval_id);
 	}
-	async load(documentId?: string) {
-		console.log('load', documentId);
+	async load(path?: string) {
+		console.log('load', path);
 		// save changes before loading other document
-		if (this.content.length > 0 && this.changes.length > 0) {
+		if (this.hasChanged) {
 			await this.saveChanges();
+			this.hasChanged = false;
 		}
 
-		documentId ??= this.documentId;
-		if (!documentId) { return; }
-		// this.api.fetchDocumentContent(documentId)
-		// 	.then((documentContent) => {
-		// 		console.log('document fetched.', documentContent);
-		// 		this.content = documentContent.nodes;
-		// 		this._onDidChangeTreeData.fire();
-		// 	})
-		// 	.catch(e => {
-		// 		console.log('error', e);
-		// 		if (!(e instanceof Error)) { return; }
-		// 		vscode.window.showErrorMessage(e.message);
-		// 	});
+		path ??= this.path;
+		if (!path) { return; }
+		const result = await this.api.fetchDocumentContent(path);
+		this.content = remark()
+			.parse(result.revision.at(0)?.body ?? '');
 	}
 
-	getTreeItem(element: ContentItem): vscode.TreeItem {
+	getTreeItem(element: RootNode): vscode.TreeItem {
 		return element;
 	}
 
-	getChildren(element?: ContentItem): Thenable<ContentItem[]> {
+	getChildren(element?: RootNode): Thenable<RootNode[]> {
 		const node = this.content.find((node: any) => element ? (node.id === element?.id) : node.id === 'root');
 		if (node && !!node.children?.length) {
 			return Promise.resolve(
 				node.children.map((childId: string) => {
 					const childNode = this.content.find((n: any) => n.id === childId);
 					if (!childNode) {
-						return new ContentItem('Error', 'error', 'Error', false, false, false);
+						return new RootNode('Error', 'error', 'Error', false, false, false);
 					}
-					return new ContentItem(childNode.content, childNode.id, childNode.note, !!childNode.children?.length, childNode.collapsed, childNode.checked);
+					return new RootNode(childNode.content, childNode.id, childNode.note, !!childNode.children?.length, childNode.collapsed, childNode.checked);
 				})
 			);
 		}
 		return Promise.resolve([]);
 	}
 
-	public insertNode(node: ContentItem | undefined, content: string) {
+	public insertNode(node: RootNode | undefined, content: string) {
 		const index = node ? this.content.findIndex(n => n.id === node.id) : 0;
 		if (index === -1) { return; }
 		const parent = node ? this.content.find(n => !!n.children?.includes(node.id)) : this.content.find(n => n.id === 'root');
@@ -100,7 +90,7 @@ export default class DocumentContentProvider implements vscode.TreeDataProvider<
 		this._onDidChangeTreeData.fire();
 	}
 
-	public editNode(node: ContentItem, content: string) {
+	public editNode(node: RootNode, content: string) {
 		this.content = this.content.map(n => n.id === node.id ? ({
 			...n,
 			content: content,
@@ -113,7 +103,7 @@ export default class DocumentContentProvider implements vscode.TreeDataProvider<
 		this._onDidChangeTreeData.fire();
 	}
 
-	public deleteNode(node: ContentItem) {
+	public deleteNode(node: RootNode) {
 		console.log("delete", { node });
 		const n = this.content.find(n => n.id === node.id);
 		if (!n) { return; }
@@ -126,7 +116,7 @@ export default class DocumentContentProvider implements vscode.TreeDataProvider<
 		});
 		this._onDidChangeTreeData.fire();
 	}
-	public toogleCheck(node: ContentItem) {
+	public toogleCheck(node: RootNode) {
 		const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
 		this.content = this.content.map(n => n.id === node.id ? ({ ...n, checked }) : n);
 		this.updateData({
@@ -136,7 +126,7 @@ export default class DocumentContentProvider implements vscode.TreeDataProvider<
 		});
 		console.log('toggleCheck', node, this.content);
 	}
-	public indentNode(node: ContentItem) {
+	public indentNode(node: RootNode) {
 		const parent = this.content.find(n => n.children?.includes(node.id));
 		if (!parent || !parent.children) {
 			return;
@@ -165,7 +155,7 @@ export default class DocumentContentProvider implements vscode.TreeDataProvider<
 		});
 		this._onDidChangeTreeData.fire();
 	}
-	public outdentNode(node: ContentItem) {
+	public outdentNode(node: RootNode) {
 		const parent = this.content.find(n => n.children?.includes(node.id));
 		if (!parent || !parent.children) {
 			return;

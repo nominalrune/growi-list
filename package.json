@@ -48,14 +48,14 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.show-document-list",
-        "title": "List documents",
+        "command": "growi-list-view.show-page-list",
+        "title": "List pages",
         "icon": "resources/sync.svg",
         "category": "GrowiList"
       },
       {
         "command": "growi-list-view.show-content",
-        "title": "Show document content",
+        "title": "Show page content",
         "icon": "resources/sync.svg"
       },
       {
@@ -97,7 +97,7 @@
           "command": "growi-list-view.delete-url"
         },
         {
-          "command": "growi-list-view.show-document-list"
+          "command": "growi-list-view.show-page-list"
         },
         {
           "command": "growi-list-view.show-content"
@@ -105,45 +105,45 @@
       ],
       "view/title": [
         {
-          "command": "growi-list-view.show-document-list",
-          "when": "view == GrowiList-document-list",
+          "command": "growi-list-view.show-page-list",
+          "when": "view == GrowiList-page-list",
           "group": "navigation"
         },
         {
           "command": "growi-list-view.node.insert",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "navigation"
         },
         {
           "command": "growi-list-view.show-content",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "growi-list-view.node.insert",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "01_file"
         },
         {
           "command": "growi-list-view.node.indent",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "02_node"
         },
         {
           "command": "growi-list-view.node.outdent",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "02_node"
         },
         {
           "command": "growi-list-view.node.edit",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "inline@0"
         },
         {
           "command": "growi-list-view.node.delete",
-          "when": "view == GrowiList-document-content",
+          "when": "view == GrowiList-page-content",
           "group": "inline@1"
         }
       ]
@@ -166,12 +166,12 @@
     "views": {
       "GrowiListPlugin": [
         {
-          "id": "growi-list-document-list",
-          "name": "GrowiList - Documents",
+          "id": "growi-list-page-list",
+          "name": "GrowiList - pages",
           "icon": "resources/icon.svg"
         },
         {
-          "id": "growi-list-document-content",
+          "id": "growi-list-page-content",
           "name": "GrowiList - Content",
           "icon": "resources/icon.svg"
         }
@@ -193,16 +193,22 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.91.0",
+    "@types/mdast": "^4.0.4",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
+    "@types/vscode": "^1.91.0",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.11.0",
-    "eslint": "^8.57.0",
-    "esbuild": "^0.21.5",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.4.5",
     "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0"
+    "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.57.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "remark": "^15.0.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5"
   }
 }

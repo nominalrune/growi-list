@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import Node from './Node';
-import File from './File';
-import { Change } from './Change';
+import File from './PageContent';
 import getToken from '../Token/getToken';
+import PageListResponse from './PageListResponse';
+import PageContent from './PageContent';
 
 export default class GrowiAPI {
 	url: string | null = null;
@@ -41,22 +41,21 @@ export default class GrowiAPI {
 		return await result.json() as T;
 	}
 	async fetchDocuments() {
-		const pages = await this.fetch<ListResponse>(`${this.url}/_api/v3/pages/recent?access_token=${this.token}`,'GET');
+		const pages = await this.fetch<PageListResponse>(`${this.url}/_api/v3/pages/recent?access_token=${this.token}`,'GET');
 		
 		console.log(pages);
-		return pages;
+		return pages.pages;
 	}
-	// async fetchDocumentContent(fileId: string) {
-	// 	console.log('fetchDocumentContent, file_id:', fileId);
-	// 	const response = await this.fetch<DocResponse>('https://growi.io/api/v1/doc/read', {
-	// 		file_id: fileId,
-	// 	});
-	// 	if (response._code !== 'Ok') {
+	async fetchDocumentContent(path: string) {
+		console.log('fetchDocumentContent, path:', path);
+		const response = await this.fetch<PageContent>(`${this.url}_api/v3/page?access_token=${this.token}&path=${encodeURI(path)}`, 'GET');
+		return response;
+		// 	if (response._code !== 'Ok') {
 	// 		console.error({ response });
 	// 		throw new Error(`Failed to fetch content. ${response._msg}, document_id:${fileId}`);
 	// 	}
 	// 	return response;
-	// }
+	}
 	// async saveDocumentContetnt(fileId: string, changes: Change[]) {
 	// 	const response = await this.fetch<EditResponse>('https://growi.io/api/v1/doc/edit', {
 	// 		file_id: fileId,
@@ -72,24 +71,4 @@ export default class GrowiAPI {
 	// 		throw new Error(`Failed to save content: ${response._msg}, document_id:${fileId}`);
 	// 	}
 	// }
-}
-type CommonError = "InvalidToken" | "TooManyRequests" | "Invalid" | "LockFail";
-interface ListResponse {
-	"_code": "Ok" | CommonError,
-	"_msg": string,
-	"root_file_id": string,
-	"files": File[],
-}
-
-interface DocResponse {
-	"_code": "Ok" | CommonError | "Unauthorized" | "NotFound",
-	"_msg": string,
-	"file_id": string,
-	"title": string,
-	"nodes": Node[];
-}
-
-interface EditResponse {
-	"_code": "Ok" | CommonError | "Unauthorized" | "NotFound" | "NodeNotFound",
-	"_msg": string,
 }

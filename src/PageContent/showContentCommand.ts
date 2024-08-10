@@ -1,9 +1,9 @@
 import { window, commands, type ExtensionContext } from 'vscode';
-import DocumentContentProvider from './DocumentContentProvider';
-import ContentItem from './ContentItem';
+import PageContentProvider from './PageContentProvider.js';
+import RootNode from './RootNode.js';
 const showContentCommand = (context: ExtensionContext) => {
 	try {
-		const provider = new DocumentContentProvider(context);
+		const provider = new PageContentProvider(context);
 		const treeView = window.createTreeView('growi-list-document-content', { treeDataProvider: provider });
 		treeView.onDidChangeCheckboxState((e) => {
 			const item = e.items[0][0];
@@ -12,7 +12,7 @@ const showContentCommand = (context: ExtensionContext) => {
 		const showContentCommand = commands.registerCommand('growi-list-view.show-content', (documentId?: string) => {
 			provider.load(documentId);
 		});
-		const insertCommand = commands.registerCommand('growi-list-view.node.insert', async (node?: ContentItem) => {
+		const insertCommand = commands.registerCommand('growi-list-view.node.insert', async (node?: RootNode) => {
 			const content = await window.showInputBox({
 				prompt: 'Enter the content for the new node',
 				ignoreFocusOut: true,
@@ -21,7 +21,7 @@ const showContentCommand = (context: ExtensionContext) => {
 				provider.insertNode(node, content);
 			}
 		});
-		const editCommand = commands.registerCommand('growi-list-view.node.edit', async (node: ContentItem) => {
+		const editCommand = commands.registerCommand('growi-list-view.node.edit', async (node: RootNode) => {
 			const content = await window.showInputBox({
 				prompt: 'Edit the content',
 				value: node.label?.toString(),
@@ -31,13 +31,13 @@ const showContentCommand = (context: ExtensionContext) => {
 				provider.editNode(node, content);
 			}
 		});
-		const deleteCommand = commands.registerCommand('growi-list-view.node.delete', (node: ContentItem) => {
+		const deleteCommand = commands.registerCommand('growi-list-view.node.delete', (node: RootNode) => {
 			provider.deleteNode(node);
 		});
-		const indentCommand = commands.registerCommand('growi-list-view.node.indent', (node: ContentItem) => {
+		const indentCommand = commands.registerCommand('growi-list-view.node.indent', (node: RootNode) => {
 			provider.indentNode(node);
 		});
-		const outdentCommand = commands.registerCommand('growi-list-view.node.outdent', (node: ContentItem) => {
+		const outdentCommand = commands.registerCommand('growi-list-view.node.outdent', (node: RootNode) => {
 			provider.outdentNode(node);
 		});
 
