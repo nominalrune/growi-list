@@ -9,10 +9,10 @@ export default class PageItem extends vscode.TreeItem {
 			vscode.TreeItemCollapsibleState.None
 		);
 		this.iconPath = vscode.ThemeIcon.File;
-		// this.command = this.type === 'document' ? {
-		// 	command: 'dynalist-plugin.show-content',
-		// 	title: 'Show Content',
-		// 	arguments: [this.id]
-		// } : undefined;
+		this.command =  {
+			command: 'growi-list-view.show-content',
+			title: 'Show Content',
+			arguments: [this.path]
+		};
 	}
 }

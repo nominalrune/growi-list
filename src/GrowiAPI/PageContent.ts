@@ -23,6 +23,6 @@ type PageContent = Omit<Page, 'revision'>&{
 	createdAt: string; // ISO 8601 date string
 	__v: number;
 	latestRevisionBodyLength: number;
-	revision: [Revision];
+	revision: Revision;
 	id: string;
 }
