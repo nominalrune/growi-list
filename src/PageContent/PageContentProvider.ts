@@ -5,6 +5,8 @@ import getToken from '../Token/getToken';
 import PageContent from '../GrowiAPI/PageContent';
 // @ts-expect-error esm module error
 import { remark } from 'remark';
+// @ts-expect-error esm module error
+import remarkGfm from 'remark-gfm';
 import { ListItem, Root } from 'mdast';
 import ListNode from './ListNode';
 export default class PageContentProvider implements vscode.TreeDataProvider<ListItemNode<ListItem>> {
@@ -34,7 +36,8 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		if (!path) { return; }
 		const result = await this.api.fetchDocumentContent(path);
 		const body = result.page.revision.body ?? '';
-		this.content = remark().parse(body);
+
+		this.content = remark().use(remarkGfm).parse(body);
 		this.path = path;
 		this._onDidChangeTreeData.fire();
 		console.log('content', body, 'parsed', this.content);
@@ -49,11 +52,17 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: ListItemNode<ListItem | Root> | ListNode): vscode.TreeItem {
+	getTreeItem(element: ListItemNode<ListItem | Root>): vscode.TreeItem {
 		return element;
 	}
 
-	getChildren(element?: ListItemNode<ListItem> | ListNode): Thenable<(ListItemNode<ListItem> | ListNode)[]> {
+	getChildren(element?: ListItemNode<ListItem>): Thenable<(ListItemNode<ListItem>)[]> {
+		if (!element) {
+			console.log('getChildren', element, "children", new ListItemNode(this.content).children);
+			return Promise.resolve(
+				new ListItemNode(this.content).children
+			);
+		}
 		if (element && !!element.children?.length) {
 			console.log('getChildren', element, "children", element.children);
 			return Promise.resolve(element.children);
@@ -119,16 +128,16 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 	// 	});
 	// 	this._onDidChangeTreeData.fire();
 	// }
-	// public toggleCheck(node: ListItemNode<ListItem>) {
-	// 	const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
-	// 	this.content = this.content.map(n => n.id === node.id ? ({ ...n, checked }) : n);
-	// 	this.updateData({
-	// 		action: 'edit',
-	// 		node_id: node.id,
-	// 		checked,
-	// 	});
-	// 	console.log('toggleCheck', node, this.content);
-	// }
+	public toggleCheck(node: ListItemNode<ListItem>) {
+		const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
+		this.content = this.content.map(n => n.id === node.id ? ({ ...n, checked }) : n);
+		this.updateData({
+			action: 'edit',
+			node_id: node.id,
+			checked,
+		});
+		console.log('toggleCheck', node, this.content);
+	}
 	// public indentNode(node: ListItemNode<ListItem>) {
 	// 	const parent = this.content.find(n => n.children?.includes(node.id));
 	// 	if (!parent || !parent.children) {
