@@ -102,7 +102,7 @@
           "command": "growi-list-view.page.edit",
           "when": "view == GrowiList-page-content",
           "group": "inline@0"
-        },
+        }
       ]
     },
     "viewsWelcome": [
