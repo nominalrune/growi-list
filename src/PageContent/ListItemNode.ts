@@ -5,9 +5,10 @@ export default class ListItemNode<T extends ListItem | Root> extends vscode.Tree
 	public children: ListItemNode<ListItem>[];
 	constructor(node: T) {
 		const content = (node?.type === 'root' ? 'root' : ListItemNode.getContent(node.children)) ?? 'root';
-		super(content, vscode.TreeItemCollapsibleState.Collapsed);
 		const lists = node.children.filter(n => n.type === 'list') as List[];
-		this.children = lists.map((list, i) => list.children.map(li=>new ListItemNode(li))).flat();
+		const collapse = lists.length > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
+		super(content, collapse);
+		this.children = lists.map((list, i) => list.children.map(li => new ListItemNode(li))).flat();
 		if (node.type === 'listItem') {
 			this.checkboxState = 'checked' in node && node.checked ? vscode.TreeItemCheckboxState.Checked : vscode.TreeItemCheckboxState.Unchecked;
 		}
