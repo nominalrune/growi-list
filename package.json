@@ -92,17 +92,18 @@
           "group": "navigation"
         },
         {
+          "command": "growi-list-view.page.edit",
+          "when": "view == GrowiList-page-content",
+          "group": "navigation"
+        },
+        {
           "command": "growi-list-view.show-content",
           "when": "view == GrowiList-page-content",
           "group": "navigation"
         }
       ],
       "view/item/context": [
-        {
-          "command": "growi-list-view.page.edit",
-          "when": "view == GrowiList-page-content",
-          "group": "inline@0"
-        }
+        
       ]
     },
     "viewsWelcome": [
