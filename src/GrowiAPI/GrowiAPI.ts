@@ -6,32 +6,20 @@ import PageContent from './PageContent';
 import getUrl from '../Token/getUrl';
 
 export default class GrowiAPI {
-	baseurl: string | null = null;
-	token: string | null = null;
+	private baseurl: string | null = null;
+	private token: string | null = null;
 	constructor(private context: vscode.ExtensionContext) {
-		this.checkBaseUrlAndToken();
+		this.check('baseurl').then(() => this.check('token'));
 	}
-	private async checkBaseUrlAndToken() {
-		if (!this.baseurl) {
-			this.baseurl = await getUrl(this.context.secrets) ?? null;
-			if (!this.baseurl) {
-				const action = await vscode.window.showInformationMessage('API url not set. Please input your growi url.', 'Input Url');
-				if (action === 'Input Url') {
-					vscode.commands.executeCommand('growi-list-view.save-url');
-				}
-				throw new Error('url not set.');
-			}
+	private async check(type: 'token' | 'baseurl') {
+		if (this[type]) { return; }
+		this[type] = await (type === "token" ? getToken : getUrl)(this.context.secrets) ?? null;
+		if (this[type]) { return; }
+		const action = await vscode.window.showInformationMessage(`API ${type} not set. Please input your growi ${type}.`, `Input ${type}`);
+		if (action === `Input ${type}`) {
+			vscode.commands.executeCommand(`growi-list-view.save-${type}`);
 		}
-		if (!this.token) {
-			this.token = await getToken(this.context.secrets) ?? null;
-			if (!this.token) {
-				const action = await vscode.window.showInformationMessage('API token not set. Please input your growi token.', 'Input token');
-				if (action === 'Input token') {
-					vscode.commands.executeCommand('growi-list-view.save-token');
-				}
-				throw new Error('Token not set.');
-			}
-		}
+		throw new Error(`${type} not set.`);
 	}
 	private async fetch<T>(url: string, method: 'GET' | 'POST', body?: object): Promise<T> {
 		const result = await fetch(url, {
@@ -41,25 +29,19 @@ export default class GrowiAPI {
 		if (!result.ok) {
 			throw new Error(`Fetch error. ${result.statusText}`);
 		}
-		// const text = await result.text();
-
-		// console.log("fetch result", text, 'url', url);
 		return await result.json() as T;
 	}
 	async fetchDocuments() {
-		await this.checkBaseUrlAndToken();
-		const pages = await this.fetch<PageListResponse>(`${this.baseurl}_api/v3/pages/recent?access_token=${encodeURI(this.token ?? '')}`, 'GET');
-
-		console.log(pages);
-		return pages.pages;
+		const result = await this.fetch<PageListResponse>(`${this.baseurl}_api/v3/pages/recent?access_token=${encodeURI(this.token ?? '')}`, 'GET');
+		console.log(result);
+		return result.pages;
 	}
 	async fetchDocumentContent(path: string) {
 		console.log('fetchDocumentContent, path:', path);
-		await this.checkBaseUrlAndToken();
-		const response = await this.fetch<{page:PageContent}>(`${this.baseurl}_api/v3/page?access_token=${encodeURI(this.token ?? '')}&path=${encodeURI(path)}`, 'GET');
+		const response = await this.fetch<{ page: PageContent; }>(`${this.baseurl}_api/v3/page?access_token=${encodeURI(this.token ?? '')}&path=${encodeURI(path)}`, 'GET');
 		return response;
 	}
-	// async saveDocumentContetnt(fileId: string, changes: Change[]) {
+	async savePageContetnt(url:string, body:string) {
 	// 	const response = await this.fetch<EditResponse>('https://growi.io/api/v1/doc/edit', {
 	// 		file_id: fileId,
 	// 		changes: changes,
@@ -73,5 +55,5 @@ export default class GrowiAPI {
 	// 	if (response._code !== 'Ok') {
 	// 		throw new Error(`Failed to save content: ${response._msg}, document_id:${fileId}`);
 	// 	}
-	// }
+	}
 }
