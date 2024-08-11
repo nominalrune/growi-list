@@ -9,38 +9,43 @@ import { ListItem, Root } from 'mdast';
 import ListNode from './ListNode';
 export default class PageContentProvider implements vscode.TreeDataProvider<ListItemNode<ListItem>> {
 	private _onDidChangeTreeData = new vscode.EventEmitter<ListItemNode<ListItem> | undefined | void>();
-	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+	public readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 	public path: string = '';
 	private api: GrowiAPI;
 	private hasChanged = false;
-	public page: PageContent | undefined;
-	private content: any; //VFile | undefined;
+	private page: PageContent | undefined;
+	private content: Root | undefined; //VFile;
 	constructor(private context: vscode.ExtensionContext) {
 		this.api = new GrowiAPI(this.context);
 		console.log('DocumentContentProvider created', {
 			api: this.api,
 		});
 	}
-	dispose() {
-		// this.saveChanges();
-	}
+	dispose() { }
 	async load(path?: string) {
 		console.log('load', path);
 		// save changes before loading other document
 		if (this.hasChanged) {
-			// await this.saveChanges();
+			await this.saveChanges();
 			this.hasChanged = false;
 		}
 
 		path ??= this.path;
 		if (!path) { return; }
 		const result = await this.api.fetchDocumentContent(path);
-		console.log('fetch result', result);
 		const body = result.page.revision.body ?? '';
-		this.content = remark()
-			.parse(body);
-			this.path = path;
+		this.content = remark().parse(body);
+		this.path = path;
+		this._onDidChangeTreeData.fire();
 		console.log('content', body, 'parsed', this.content);
+	}
+	public async saveChanges() {
+		if (this.hasChanged) {
+			console.log('saveChanges started');
+			const body = this.page?.revision.body ?? ''; // FIXME
+			await this.api.savePageContetnt(this.path, body);
+		}
+		this.hasChanged = false;
 		this._onDidChangeTreeData.fire();
 	}
 
@@ -50,10 +55,11 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 
 	getChildren(element?: ListItemNode<ListItem> | ListNode): Thenable<(ListItemNode<ListItem> | ListNode)[]> {
 		if (element && !!element.children?.length) {
-			console.log('getChildren', element, "children",element.children)
+			console.log('getChildren', element, "children", element.children);
 			return Promise.resolve(element.children);
 		}
-		console.log('getChildren', element, "children",new ListItemNode(this.content).children)
+		if (!this.content) { return Promise.resolve([]); }
+		console.log('getChildren', element, "children", new ListItemNode(this.content).children);
 		return Promise.resolve(
 			new ListItemNode(this.content).children
 		);
@@ -182,16 +188,4 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 	// 	this._onDidChangeTreeData.fire();
 	// }
 
-	// private updateData(change: Change) {
-	// 	this.changes.push(change);
-	// 	return this.changes;
-	// }
-	// public async saveChanges() {
-	// 	console.log('saveChanges started', this.changes);
-	// 	// this.api.saveDocumentContetnt(this.documentId, this.changes).then(() => {
-	// 	// 	this._onDidChangeTreeData.fire();
-	// 	// 	this.changes = [];
-	// 	// 	console.log('saveChanges finished', this.changes, this.content);
-	// 	// });
-	// }
 }
