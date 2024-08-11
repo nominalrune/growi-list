@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Node, List, ListItem, Root, Paragraph, Image } from 'mdast';
 export default class ListItemNode<T extends ListItem | Root> extends vscode.TreeItem {
 	public children: ListItemNode<ListItem>[];
-	constructor(public readonly id: string, node: T) {
+	constructor(public readonly id: string, public node: T) {
 		const content = (node?.type === 'root' ? 'root' : ListItemNode.getContent(node.children)) ?? 'root';
 		const lists = node.children.filter(n => n.type === 'list') as List[];
 		const collapse = lists.length > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;

@@ -21,8 +21,8 @@
         "command": "growi-list-view.save-token",
         "title": "Input token",
         "icon": {
-          "light": "resources/key.svg",
-          "dark": "resources/key.svg"
+          "light": "resources/light/key.svg",
+          "dark": "resources/dark/key.svg"
         },
         "category": "GrowiList"
       },
@@ -30,38 +30,55 @@
         "command": "growi-list-view.save-url",
         "title": "Input url",
         "icon": {
-          "light": "resources/key.svg",
-          "dark": "resources/key.svg"
+          "light": "resources/light/key.svg",
+          "dark": "resources/dark/key.svg"
         },
         "category": "GrowiList"
       },
       {
         "command": "growi-list-view.delete-token",
         "title": "Delete token",
-        "icon": "resources/key.svg",
+        "icon": {
+          "light": "resources/light/key.svg",
+          "dark": "resources/dark/key.svg"
+        },
         "category": "GrowiList"
       },
       {
         "command": "growi-list-view.delete-url",
         "title": "Delete url",
-        "icon": "resources/key.svg",
+        "icon": {
+          "light": "resources/light/key.svg",
+          "dark": "resources/dark/key.svg"
+        },
         "category": "GrowiList"
       },
       {
         "command": "growi-list-view.show-page-list",
         "title": "List pages",
-        "icon": "resources/sync.svg",
+        "icon": {
+          "light": "resources/light/sync.svg",
+          "dark": "resources/dark/sync.svg"
+        },
         "category": "GrowiList"
       },
       {
         "command": "growi-list-view.show-content",
         "title": "Show page content",
-        "icon": "resources/sync.svg"
+        "icon": {
+          "light": "resources/light/sync.svg",
+          "dark": "resources/dark/sync.svg"
+        },
+        "category": "GrowiList"
       },
       {
         "command": "growi-list-view.page.edit",
         "title": "Edit page content using editor",
-        "icon": "resources/edit.svg"
+        "icon": {
+          "light": "resources/light/edit.svg",
+          "dark": "resources/dark/edit.svg"
+        },
+        "category": "GrowiList"
       }
     ],
     "menus": {
@@ -83,27 +100,29 @@
         },
         {
           "command": "growi-list-view.show-content"
+        },
+        {
+          "command": "growi-list-view.page.edit"
         }
       ],
       "view/title": [
         {
           "command": "growi-list-view.show-page-list",
-          "when": "view == GrowiList-page-list",
-          "group": "navigation"
-        },
-        {
-          "command": "growi-list-view.page.edit",
-          "when": "view == GrowiList-page-content",
+          "when": "view == growi-list-page-list",
           "group": "navigation"
         },
         {
           "command": "growi-list-view.show-content",
-          "when": "view == GrowiList-page-content",
+          "when": "view == growi-list-page-content",
           "group": "navigation"
         }
       ],
       "view/item/context": [
-        
+        {
+          "command": "growi-list-view.page.edit",
+          "when": "view == growi-list-page-list",
+          "group": "inline"
+        }
       ]
     },
     "viewsWelcome": [
@@ -117,7 +136,7 @@
         {
           "id": "GrowiListPlugin",
           "title": "GrowiList",
-          "icon": "resources/icon.svg"
+          "icon": "resources/growi-logo.svg"
         }
       ]
     },
@@ -126,12 +145,12 @@
         {
           "id": "growi-list-page-list",
           "name": "GrowiList - pages",
-          "icon": "resources/icon.svg"
+          "icon": "resources/growi-logo.svg"
         },
         {
           "id": "growi-list-page-content",
           "name": "GrowiList - Content",
-          "icon": "resources/icon.svg"
+          "icon": "resources/growi-logo.svg"
         }
       ]
     }
@@ -170,6 +189,7 @@
   "dependencies": {
     "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
     "unified": "^11.0.5"
   }
 }

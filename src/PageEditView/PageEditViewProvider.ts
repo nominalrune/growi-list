@@ -1,26 +1,29 @@
 import * as vscode from 'vscode';
-import SimpleMDE from 'simplemde';
-import { jsx } from 'react/jsx-runtime';
-import { createRoot } from 'react-dom/client';
+import PageItem from '../PageList/PageItem';
+import GrowiAPI from '../GrowiAPI/GrowiAPI';
 export default class PageEditViewProvider {
 	public static currentPanel: PageEditViewProvider | undefined;
 
 	public static readonly viewType = 'pageEditView';
-
-	private readonly _panel: vscode.WebviewPanel;
-	private readonly _extensionUri: vscode.Uri;
-	private _disposables: vscode.Disposable[] = [];
+	private api: GrowiAPI;
+	private readonly panel: vscode.WebviewPanel;
+	private readonly extensionUri: vscode.Uri;
+	private disposables: vscode.Disposable[] = [];
 	public path = '';
 	public content: string = '';
 
-	public static createOrShow(extensionUri: vscode.Uri, content: string) {
+	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext) {
+		console.log('createOrShow');
+
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
 
 		// If we already have a panel, show it.
 		if (PageEditViewProvider.currentPanel) {
-			PageEditViewProvider.currentPanel._panel.reveal(column);
+			PageEditViewProvider.currentPanel.update(pageItem.path).then(() => {
+				PageEditViewProvider.currentPanel?.panel.reveal(column);
+			});
 			return;
 		}
 
@@ -30,43 +33,43 @@ export default class PageEditViewProvider {
 			'Page Edit',
 			column || vscode.ViewColumn.One,
 			{
-				// Enable javascript in the webview
 				enableScripts: true,
+				retainContextWhenHidden: true,
 			},
 		);
-		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, content);
-
+		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);
 	}
 
-	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, content: string) {
-		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, content);
+	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext) {
+		console.log('revive', context);
+		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);
 	}
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, content: string) {
-		this._panel = panel;
-		this._extensionUri = extensionUri;
-		this.content = content;
-
-		// Set the webview's initial html content
-		this._update();
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, public pageItem: PageItem, context: vscode.ExtensionContext) {
+		console.log('constructor');
+		this.panel = panel;
+		this.extensionUri = extensionUri;
+		// this.content = pageItem;
+		this.api = new GrowiAPI(context);
+		this.update(pageItem.path);
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
-		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+		this.panel.onDidDispose(() => { console.log('dispose EditViewProv'); this.dispose(); }, null, this.disposables);
 
-		// Update the content based on view changes
-		this._panel.onDidChangeViewState(
+		this.panel.onDidChangeViewState(
 			e => {
-				if (this._panel.visible) {
-					this._update();
+				console.log('this._panel.onDidChangeViewState', { e });
+				if (this.panel.visible) {
+					this.update(pageItem.path);
 				}
 			},
 			null,
-			this._disposables
+			this.disposables
 		);
 
 		// Handle messages from the webview
-		this._panel.webview.onDidReceiveMessage(
+		this.panel.webview.onDidReceiveMessage(
 			message => {
 				switch (message.command) {
 					case 'load':
@@ -78,14 +81,14 @@ export default class PageEditViewProvider {
 				}
 			},
 			null,
-			this._disposables
+			this.disposables
 		);
 	}
 
-	public save() {
+	public async save() {
 		// Send a message to the webview webview.
 		// You can send any JSON serializable data.
-		this._panel.webview.postMessage({
+		this.panel.webview.postMessage({
 			command: 'save',
 			content: this.content,
 		});
@@ -94,36 +97,41 @@ export default class PageEditViewProvider {
 	public dispose() {
 		PageEditViewProvider.currentPanel = undefined;
 		// Clean up our resources
-		this._panel.dispose();
-		while (this._disposables.length) {
-			const x = this._disposables.pop();
+		this.panel.dispose();
+		while (this.disposables.length) {
+			const x = this.disposables.pop();
 			if (x) {
 				x.dispose();
 			}
 		}
 	}
 
-	private _update() {
-		const webview = this._panel.webview;
-		this._panel.webview.html = this._getHtmlForWebview(webview);
-
+	private async update(path: string) {
+		this.path = path;
+		const webview = this.panel.webview;
+		this.content = (await this.api.fetchDocumentContent(path)).page.revision.body;
+		this.panel.webview.html = this.getHtmlForWebview(webview);
 	};
 
-	private _getHtmlForWebview(webview: vscode.Webview) {
+	private getHtmlForWebview(webview: vscode.Webview) {
 		// Local path to main script run in the webview
-		const scriptPathOnDisk = vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js');
-		const editorScriptPathOnDisk = vscode.Uri.joinPath(this._extensionUri, 'media', 'simplemde.min.js');
+		const scriptPathOnDisk = vscode.Uri.joinPath(this.extensionUri, 'media', 'main.js');
+		const editorScriptPathOnDisk = vscode.Uri.joinPath(this.extensionUri, 'media', 'simplemde.min.js');
 
 		// And the uri we use to load this script in the webview
 		const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
 		const editorScriptUri = webview.asWebviewUri(editorScriptPathOnDisk);
 
 		// Local path to css styles
-		const editorStylePath = vscode.Uri.joinPath(this._extensionUri, 'media', 'simplemde.min.css');
-		const stylesPathMainPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css');
+		const editorStylePath = vscode.Uri.joinPath(this.extensionUri, 'media', 'simplemde.min.css');
+		const faStylePath = vscode.Uri.joinPath(this.extensionUri, 'media', 'fa', 'css', 'fa.css');
+		const faFontPath = vscode.Uri.joinPath(this.extensionUri, 'media', 'fa', 'fonts', 'fontawesome-webfont.woff2');
+		const stylesPathMainPath = vscode.Uri.joinPath(this.extensionUri, 'media', 'main.css');
 
 		// Uri to load styles into webview
 		const editorStylesUri = webview.asWebviewUri(editorStylePath);
+		const faStylesUri = webview.asWebviewUri(faStylePath);
+		const faFontUri = webview.asWebviewUri(faFontPath);
 		const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
 
 		// Use a nonce to only allow specific scripts to be run
@@ -132,27 +140,23 @@ export default class PageEditViewProvider {
 		return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
-				<meta charset="UTF-8">
-
-				<!--
-					Use a content security policy to only allow loading images from https or from our extension directory,
-					and only allow scripts that have a specific nonce.
-				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
-
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; font-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<link href="${editorStylesUri}" rel="stylesheet">
 				<link href="${stylesMainUri}" rel="stylesheet">
+				<link href="${faFontUri}" rel="preload" as="font" type="font/woff2">
+				<link href="${faStylesUri}" rel="stylesheet">
 
 				<title>Cat Coding</title>
 			</head>
 			<body>
 				<h1>${this.path}</h1>
-				<textarea id='root' value='${this.content}'></textarea>
+				<textarea id='editor'></textarea>
+				<textarea id='source'>${this.content}</textarea>
 
-				<script nonce="${nonce}" src="${scriptUri}"></script>
 				<script nonce="${nonce}" src="${editorScriptUri}"></script>
+				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
 	}
