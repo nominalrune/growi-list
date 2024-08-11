@@ -59,27 +59,9 @@
         "icon": "resources/sync.svg"
       },
       {
-        "command": "growi-list-view.node.insert",
-        "title": "Insert Node",
-        "icon": "resources/plus.svg"
-      },
-      {
-        "command": "growi-list-view.node.indent",
-        "title": "Indent Node"
-      },
-      {
-        "command": "growi-list-view.node.outdent",
-        "title": "Outdent Node"
-      },
-      {
-        "command": "growi-list-view.node.edit",
-        "title": "Edit Node",
+        "command": "growi-list-view.page.edit",
+        "title": "Edit page content using editor",
         "icon": "resources/edit.svg"
-      },
-      {
-        "command": "growi-list-view.node.delete",
-        "title": "Delete Node",
-        "icon": "resources/x.svg"
       }
     ],
     "menus": {
@@ -110,11 +92,6 @@
           "group": "navigation"
         },
         {
-          "command": "growi-list-view.node.insert",
-          "when": "view == GrowiList-page-content",
-          "group": "navigation"
-        },
-        {
           "command": "growi-list-view.show-content",
           "when": "view == GrowiList-page-content",
           "group": "navigation"
@@ -122,36 +99,16 @@
       ],
       "view/item/context": [
         {
-          "command": "growi-list-view.node.insert",
-          "when": "view == GrowiList-page-content",
-          "group": "01_file"
-        },
-        {
-          "command": "growi-list-view.node.indent",
-          "when": "view == GrowiList-page-content",
-          "group": "02_node"
-        },
-        {
-          "command": "growi-list-view.node.outdent",
-          "when": "view == GrowiList-page-content",
-          "group": "02_node"
-        },
-        {
-          "command": "growi-list-view.node.edit",
+          "command": "growi-list-view.page.edit",
           "when": "view == GrowiList-page-content",
           "group": "inline@0"
         },
-        {
-          "command": "growi-list-view.node.delete",
-          "when": "view == GrowiList-page-content",
-          "group": "inline@1"
-        }
       ]
     },
     "viewsWelcome": [
       {
         "view": "GrowiListPlugin",
-        "contents": "Input your token\n[input](command:growi-list-view.save-token)"
+        "contents": "Input your url\n[input](command:growi-list-view.save-url)"
       }
     ],
     "viewsContainers": {
@@ -210,11 +167,8 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",
-    "simplemde": "^1.11.2",
     "unified": "^11.0.5"
   }
 }
