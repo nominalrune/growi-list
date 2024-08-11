@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import { Node, List, ListItem, Root, Paragraph, Image } from 'mdast';
-import ListNode from './ListNode';
 export default class ListItemNode<T extends ListItem | Root> extends vscode.TreeItem {
 	public children: ListItemNode<ListItem>[];
-	constructor(node: T) {
+	constructor(public readonly id: string, node: T) {
 		const content = (node?.type === 'root' ? 'root' : ListItemNode.getContent(node.children)) ?? 'root';
 		const lists = node.children.filter(n => n.type === 'list') as List[];
 		const collapse = lists.length > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
 		super(content, collapse);
-		this.children = lists.map((list, i) => list.children.map(li => new ListItemNode(li))).flat();
+		this.tooltip = this.id;
+		this.children = node.children.map((node, i) => node.type !== "list" ? [undefined] : node.children.map((li, j) => new ListItemNode(`${id}-${i}-${j}`, li))).flat().filter(i=>i!==undefined);
 		if (node.type === 'listItem') {
 			this.checkboxState = 'checked' in node && node.checked ? vscode.TreeItemCheckboxState.Checked : vscode.TreeItemCheckboxState.Unchecked;
 		}
