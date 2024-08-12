@@ -26,17 +26,16 @@ export default class GrowiAPI {
 		await this.check('url');
 		await this.check('token');
 	}
-	private async fetch<T>(url: string, method: 'GET' | 'POST', urlParam?:object, body?: object): Promise<T> {
+	private async fetch<T>(url: string, method: 'GET' | 'POST', urlParam?: object, body?: object): Promise<T> {
 		await this.checkAll();
-		const _url = new URL(this.url??'');
-		_url.pathname=`_api/v3/${url}`
+		const _url = new URL(this.url ?? '');
+		_url.pathname = `_api/v3/${url}`;
 		_url.searchParams.set('access_token', this.token ?? '');
-		if(urlParam){
-			Object.entries(urlParam).forEach(([k,v])=>{
-				_url.searchParams.set(k,v);
+		if (urlParam) {
+			Object.entries(urlParam).forEach(([k, v]) => {
+				_url.searchParams.set(k, v);
 			});
 		}
-		console.log(_url)
 		const result = await fetch(_url.toString(), {
 			method: method,
 			body: JSON.stringify(body)
@@ -54,22 +53,16 @@ export default class GrowiAPI {
 	async fetchDocumentContent(path: string) {
 		console.log('fetchDocumentContent, path:', path);
 		const encodedPath = encodeURI(path);
-		const response = await this.fetch<{ page: PageContent; }>(`page`, 'GET', {path:encodedPath});
+		const response = await this.fetch<{ page: PageContent; }>(`page`, 'GET', { path: encodedPath });
 		return response;
 	}
-	async savePageContetnt(url: string, body: string) {
-		// 	const response = await this.fetch<EditResponse>('https://growi.io/api/v1/doc/edit', {
-		// 		file_id: fileId,
-		// 		changes: changes,
-		// 	})
-		// 		.catch(e => {
-		// 			if (e instanceof Error) {
-		// 				throw e;
-		// 			} else { throw new Error(`Failed to save content: ${String(e)}, document_id:${fileId}`); }
-		// 		});
-		// 	console.log('saveDocumentContetnt response:', response);
-		// 	if (response._code !== 'Ok') {
-		// 		throw new Error(`Failed to save content: ${response._msg}, document_id:${fileId}`);
-		// 	}
+	async savePageContetnt(page: PageContent) {
+		const response = await this.fetch('pages.update', 'POST', undefined, {
+			page_id: page.id,
+			revision_id: page.revision._id,
+			body: page.revision.body,
+		});
+		console.log('saveDocumentContetnt response:', response);
+		return response;
 	}
 }

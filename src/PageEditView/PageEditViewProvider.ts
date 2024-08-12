@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import PageItem from '../PageList/PageItem';
 import GrowiAPI from '../GrowiAPI/GrowiAPI';
+import PageContent from '../GrowiAPI/PageContent';
 export default class PageEditViewProvider {
 	public static currentPanel: PageEditViewProvider | undefined;
 
@@ -9,8 +10,26 @@ export default class PageEditViewProvider {
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionUri: vscode.Uri;
 	private disposables: vscode.Disposable[] = [];
-	public path = '';
-	public content: string = '';
+	#page: PageContent | undefined;
+	private get page() {
+		return this.#page;
+	}
+	private set page(value: PageContent | undefined) {
+		this.#page = value;
+		const webview = this.panel.webview;
+		this.panel.webview.html = this.getHtmlForWebview(webview);
+	}
+	private get path() {
+		return this.page?.path;
+	}
+	private get content() {
+		return this.page?.revision.body ?? '';
+	}
+	private set content(value: string) {
+		if (this.page) {
+			this.page.revision.body = value;
+		}
+	}
 
 	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext) {
 		console.log('createOrShow');
@@ -35,7 +54,7 @@ export default class PageEditViewProvider {
 			{
 				enableScripts: true,
 				retainContextWhenHidden: false,
-				localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
+				localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
 			},
 		);
 		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);
@@ -50,34 +69,33 @@ export default class PageEditViewProvider {
 		console.log('constructor');
 		this.panel = panel;
 		this.extensionUri = extensionUri;
-		// this.content = pageItem;
 		this.api = new GrowiAPI(context);
 		this.update(pageItem.path);
 
-		// Listen for when the panel is disposed
-		// This happens when the user closes the panel or when the panel is closed programmatically
-		this.panel.onDidDispose(() => { console.log('dispose EditViewProv'); this.dispose(); }, null, this.disposables);
-
-		this.panel.onDidChangeViewState(
-			e => {
-				console.log('this._panel.onDidChangeViewState', { e });
-				if (this.panel.visible) {
-					this.update(pageItem.path);
-				}
-			},
+		// do this when the panel is closed
+		this.panel.onDidDispose(() => {
+			console.log('dispose EditViewProv'); this.dispose();
+		},
 			null,
-			this.disposables
-		);
+			this.disposables);
+
+		// this.panel.onDidChangeViewState(
+		// 	e => {
+		// 		console.log('this._panel.onDidChangeViewState', { e });
+		// 		if (this.panel.visible) {
+		// 			this.update(pageItem.path);
+		// 		}
+		// 	},
+		// 	null,
+		// 	this.disposables
+		// );
 
 		// Handle messages from the webview
 		this.panel.webview.onDidReceiveMessage(
 			message => {
 				switch (message.command) {
-					case 'load':
-						this.content = message.content;
-						break;
 					case 'save':
-						vscode.commands.executeCommand('growi-list-view.save-page', [this.content]);
+						this.save();
 						return;
 				}
 			},
@@ -87,11 +105,18 @@ export default class PageEditViewProvider {
 	}
 
 	public async save() {
-		// Send a message to the webview webview.
-		// You can send any JSON serializable data.
+		if (!this.page) { return; }
+		try {
+			await this.api.savePageContetnt(this.page);
+		} catch (e) {
+			this.panel.webview.postMessage({
+				command: 'saveFailed',
+				message: String(e),
+			});
+			return;
+		}
 		this.panel.webview.postMessage({
-			command: 'save',
-			content: this.content,
+			command: 'saved',
 		});
 	}
 
@@ -108,10 +133,7 @@ export default class PageEditViewProvider {
 	}
 
 	private async update(path: string) {
-		this.path = path;
-		const webview = this.panel.webview;
-		this.content = (await this.api.fetchDocumentContent(path)).page.revision.body;
-		this.panel.webview.html = this.getHtmlForWebview(webview);
+		this.page = (await this.api.fetchDocumentContent(path)).page;
 	};
 
 	private getHtmlForWebview(webview: vscode.Webview) {
