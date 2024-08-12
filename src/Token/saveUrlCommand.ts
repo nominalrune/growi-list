@@ -15,7 +15,7 @@ async function store(context: ExtensionContext) {
 	});
 	if (url) {
 		try {
-			const setting = await Setting.instanciate(context);
+			const setting = await Setting.getInstance(context);
 			setting.url = url;
 			window.showInformationMessage('Url saved successfully.');
 			commands.executeCommand('growi-list-view.show-page-list');
@@ -26,7 +26,7 @@ async function store(context: ExtensionContext) {
 	return;
 }
 async function destroy(context: ExtensionContext) {
-	const setting = await Setting.instanciate(context);
+	const setting = await Setting.getInstance(context);
 	setting.url = undefined;
 }
 

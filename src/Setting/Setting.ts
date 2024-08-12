@@ -5,7 +5,7 @@ export class Setting {
 	private _onDidChange: EventEmitter<'url' | 'token'> = new EventEmitter();
 	readonly onDidChange: Event<'url' | 'token'> = this._onDidChange.event;
 	private disposables: Disposable[] = [];
-	public static async instanciate(context: ExtensionContext) {
+	public static async getInstance(context: ExtensionContext) {
 		const setting = new Setting(context);
 		await setting.init();
 		return setting;
@@ -39,7 +39,9 @@ export class Setting {
 	get token(): string {
 		const token = this.#token;
 		if (!token) {
-			this.promoteInput('token');
+			this.promoteInput('token').then(()=>{
+				this.init();
+			});
 			throw new Error('token not set');
 		}
 		return token;
