@@ -26,10 +26,17 @@ export default class GrowiAPI {
 		await this.check('url');
 		await this.check('token');
 	}
-	private async fetch<T>(url: string, method: 'GET' | 'POST', body?: object): Promise<T> {
+	private async fetch<T>(url: string, method: 'GET' | 'POST', urlParam?:object, body?: object): Promise<T> {
 		await this.checkAll();
-		const _url = new URL(`${this.url}_api/v3/${url}`);
+		const _url = new URL(this.url??'');
+		_url.pathname=`_api/v3/${url}`
 		_url.searchParams.set('access_token', this.token ?? '');
+		if(urlParam){
+			Object.entries(urlParam).forEach(([k,v])=>{
+				_url.searchParams.set(k,v);
+			});
+		}
+		console.log(_url)
 		const result = await fetch(_url.toString(), {
 			method: method,
 			body: JSON.stringify(body)
@@ -47,7 +54,7 @@ export default class GrowiAPI {
 	async fetchDocumentContent(path: string) {
 		console.log('fetchDocumentContent, path:', path);
 		const encodedPath = encodeURI(path);
-		const response = await this.fetch<{ page: PageContent; }>(`page?path=${encodedPath}`, 'GET');
+		const response = await this.fetch<{ page: PageContent; }>(`page`, 'GET', {path:encodedPath});
 		return response;
 	}
 	async savePageContetnt(url: string, body: string) {
