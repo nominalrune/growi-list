@@ -1,5 +1,5 @@
 {
-  "name": "growi-list-view",
+  "name": "growi-todo-list",
   "displayName": "growi list view",
   "description": "[unofficial] growi vscode extention",
   "version": "0.1.0",
@@ -153,6 +153,17 @@
           "icon": "resources/growi-logo.svg"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Growi List View",
+      "properties": {
+        "growi-list-view.url": {
+          "type": "string",
+          "default": null,
+          "description": "hosturl of your growi service"
+        }
+      }
     }
   },
   "scripts": {

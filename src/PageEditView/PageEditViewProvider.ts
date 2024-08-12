@@ -38,8 +38,8 @@ export default class PageEditViewProvider {
 		};
 	};
 
-	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext) {
-		console.log('createOrShow');
+	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext, channel:vscode.OutputChannel) {
+		channel.appendLine('createOrShow');
 
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
@@ -60,19 +60,19 @@ export default class PageEditViewProvider {
 			column || vscode.ViewColumn.One,
 			PageEditViewProvider.getPanelOptions(extensionUri),
 		);
-		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);
+		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context, channel);
 	}
 
-	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext) {
+	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext, channel : vscode.OutputChannel) {
 		console.log('revive', context);
-		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);
+		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context, channel);
 	}
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, public pageItem: PageItem, context: vscode.ExtensionContext) {
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, public pageItem: PageItem, context: vscode.ExtensionContext, private channel:vscode.OutputChannel) {
 		console.log('constructor');
 		this.panel = panel;
 		this.extensionUri = extensionUri;
-		this.api = new GrowiAPI(context);
+		this.api = new GrowiAPI(context, channel);
 		this.update(pageItem.path);
 
 		// do this when the panel is closed

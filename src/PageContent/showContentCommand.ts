@@ -1,10 +1,10 @@
-import { window, commands, type ExtensionContext } from 'vscode';
+import { window, commands, type ExtensionContext, type OutputChannel } from 'vscode';
 import PageContentProvider from './PageContentProvider.js';
 import { ListItem, Root } from 'mdast';
 import ListItemNode from './ListItemNode.js';
-const showContentCommand = (context: ExtensionContext) => {
+const showContentCommand = (context: ExtensionContext, channel: OutputChannel) => {
 	try {
-		const provider = new PageContentProvider(context);
+		const provider = new PageContentProvider(context, channel);
 		const treeView = window.createTreeView('growi-list-page-content', { treeDataProvider: provider });
 		treeView.onDidChangeCheckboxState((e) => {
 			const item = e.items[0][0];

@@ -8,12 +8,11 @@ import getUrl from '../Token/getUrl';
 export default class GrowiAPI {
 	private url: string | null = null;
 	private token: string | null = null;
-	constructor(private context: vscode.ExtensionContext) {
+	constructor(private context: vscode.ExtensionContext, private channel: vscode.OutputChannel) {
 	}
 	private async check(type: 'token' | 'url') {
-		console.log('check 01:', type, this[type]);
 		if (!!this[type]) { return; }
-		this[type] = encodeURI(await (type === "token" ? getToken : getUrl)(this.context.secrets) ?? '');
+		this[type] = encodeURI(await (type === "token" ? getToken : getUrl)(this.context) ?? '');
 		console.log('check 02:', type, this[type]);
 		if (!!this[type]) { return; }
 		const action = await vscode.window.showInformationMessage(`API ${type} not set. Please input your growi ${type}.`, `Input ${type}`);

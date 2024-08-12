@@ -9,8 +9,8 @@ export default class PageListProvider implements vscode.TreeDataProvider<PageIte
 	private pages: Page[] | null = null;
 	private api: GrowiAPI;
 
-	constructor(context: vscode.ExtensionContext) {
-		this.api = new GrowiAPI(context);
+	constructor(context: vscode.ExtensionContext, private channel: vscode.OutputChannel) {
+		this.api = new GrowiAPI(context, channel);
 		this.reload()
 			.catch((e) => {
 				if (e instanceof Error) {

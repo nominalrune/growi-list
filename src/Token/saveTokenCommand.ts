@@ -16,7 +16,7 @@ async function store(context: ExtensionContext) {
 		try {
 			await context.secrets.store(TOKEN_KEY, token);
 			window.showInformationMessage('Token saved successfully.');
-			commands.executeCommand('growi-list-view.show-document-list');
+			commands.executeCommand('growi-list-view.show-page-list');
 		} catch (error) {
 			window.showErrorMessage('Failed to save token.');
 		}

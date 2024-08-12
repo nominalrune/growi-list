@@ -25,8 +25,8 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		}
 	}
 	private markdown: MarkdownService;
-	constructor(private context: vscode.ExtensionContext) {
-		this.api = new GrowiAPI(this.context);
+	constructor(private context: vscode.ExtensionContext, private channel:vscode.OutputChannel) {
+		this.api = new GrowiAPI(this.context, channel);
 		this.markdown = new MarkdownService();
 		console.log('DocumentContentProvider created', {
 			api: this.api,
@@ -54,7 +54,7 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 	}
 
 	async load(path?: string) {
-		console.log('load', path);
+		this.channel.appendLine('load: '+path);
 		// save changes before loading other document
 		if (this.hasChanged) {
 			await this.saveChanges();
