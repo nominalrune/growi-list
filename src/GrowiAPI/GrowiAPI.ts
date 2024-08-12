@@ -12,7 +12,7 @@ export default class GrowiAPI {
 		if (this.setting) {
 			return this.setting;
 		}
-		this.setting = await Setting.instanciate(this.context);
+		this.setting = await Setting.getInstance(this.context);
 		return this.setting;
 	}
 	private async fetch<T>(path: string, method: 'GET' | 'POST' | 'PUT', urlParam?: object, body?: object): Promise<T> {
