@@ -35,7 +35,7 @@ export default class GrowiAPI {
 			body: JSON.stringify(body)
 		});
 		if (!result.ok) {
-			throw new Error(`Fetch error. ${result.status} ${result.statusText} | ${await result.text()}`);
+			throw new Error(`Fetch error. ${result.status} ${result.statusText}, url:${_url.toString()} | ${await result.text()}`);
 		}
 		return await result.json() as T;
 	}
