@@ -1,35 +1,25 @@
 import * as vscode from 'vscode';
-import File from './PageContent';
-import getToken from '../Token/getToken';
 import PageListResponse from './PageListResponse';
 import PageContent from './PageContent';
-import getUrl from '../Token/getUrl';
+import { Setting } from '../Setting/Setting';
 
 export default class GrowiAPI {
-	private url: string | null = null;
-	private token: string | null = null;
+	private setting: { url: string, token: string; } | undefined;
 	constructor(private context: vscode.ExtensionContext, private channel: vscode.OutputChannel) {
+		this.getSetting();
 	}
-	private async check(type: 'token' | 'url') {
-		if (!!this[type]) { return; }
-		this[type] = encodeURI(await (type === "token" ? getToken : getUrl)(this.context) ?? '');
-		console.log('check 02:', type, this[type]);
-		if (!!this[type]) { return; }
-		const action = await vscode.window.showInformationMessage(`API ${type} not set. Please input your growi ${type}.`, `Input ${type}`);
-		if (action === `Input ${type}`) {
-			return await vscode.commands.executeCommand(`growi-list-view.save-${type}`);
+	private async getSetting() {
+		if (this.setting) {
+			return this.setting;
 		}
-		throw new Error(`${type} not set.`);
+		this.setting = await Setting.instanciate(this.context);
+		return this.setting;
 	}
-	private async checkAll() {
-		await this.check('url');
-		await this.check('token');
-	}
-	private async fetch<T>(url: string, method: 'GET' | 'POST', urlParam?: object, body?: object): Promise<T> {
-		await this.checkAll();
-		const _url = new URL(this.url ?? '');
-		_url.pathname = `_api/v3/${url}`;
-		_url.searchParams.set('access_token', this.token ?? '');
+	private async fetch<T>(path: string, method: 'GET' | 'POST', urlParam?: object, body?: object): Promise<T> {
+		const { url, token } = await this.getSetting();
+		const _url = new URL(url ?? '');
+		_url.pathname = `_api/v3/${path}`;
+		_url.searchParams.set('access_token', token ?? '');
 		if (urlParam) {
 			Object.entries(urlParam).forEach(([k, v]) => {
 				_url.searchParams.set(k, v);

@@ -15,9 +15,8 @@ async function store(context: ExtensionContext) {
 	});
 	if (url) {
 		try {
-			const setting = new Setting(context);
+			const setting = await Setting.instanciate(context);
 			setting.url = url;
-			// await context.secrets.store(URL_KEY, url);
 			window.showInformationMessage('Url saved successfully.');
 			commands.executeCommand('growi-list-view.show-page-list');
 		} catch (error) {
@@ -26,10 +25,9 @@ async function store(context: ExtensionContext) {
 	}
 	return;
 }
-function destroy(context: ExtensionContext) {
-	const setting = new Setting(context);
+async function destroy(context: ExtensionContext) {
+	const setting = await Setting.instanciate(context);
 	setting.url = undefined;
-	// context.secrets.delete(URL_KEY);
 }
 
 export default saveUrlCommand;

@@ -8,7 +8,7 @@ const saveTokenCommand = (context: ExtensionContext) => {
 
 async function store(context: ExtensionContext) {
 	const token = await window.showInputBox({
-		prompt: 'Enter your Dynalist API Token',
+		prompt: 'Enter your Growi API Token',
 		ignoreFocusOut: true,
 		password: true,
 	});
