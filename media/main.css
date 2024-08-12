@@ -1,3 +1,26 @@
-#source{
-	opacity: 0.5;
+#source {
+	display: hidden;
+}
+
+.message-area {
+	display: flex;
+	justify-content: right;
+	padding: 0.25rem;
+	color: var(--vscode-editor-foreground);
+}
+
+.action-area {
+	display: flex;
+	justify-content: right;
+	padding: 0.25rem;
+}
+
+button {
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.25rem;
+	border: none;
+}
+
+#save-button{
+	background-color: #67a4ff;
 }

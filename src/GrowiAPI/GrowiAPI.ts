@@ -15,7 +15,7 @@ export default class GrowiAPI {
 		this.setting = await Setting.instanciate(this.context);
 		return this.setting;
 	}
-	private async fetch<T>(path: string, method: 'GET' | 'POST', urlParam?: object, body?: object): Promise<T> {
+	private async fetch<T>(path: string, method: 'GET' | 'POST' | 'PUT', urlParam?: object, body?: object): Promise<T> {
 		const { url, token } = await this.getSetting();
 		const _url = new URL(url ?? '');
 		_url.pathname = `_api/v3/${path}`;
@@ -25,9 +25,11 @@ export default class GrowiAPI {
 				_url.searchParams.set(k, v);
 			});
 		}
+		console.log("url", _url.toString());
+		console.log("body", body ? JSON.stringify(body) : undefined);
 		const result = await fetch(_url.toString(), {
 			method: method,
-			body: JSON.stringify(body)
+			...(body ? { body: JSON.stringify(body) } : {})
 		});
 		if (!result.ok) {
 			throw new Error(`Fetch error. ${result.status} ${result.statusText}, url:${_url.toString()} | ${await result.text()}`);
@@ -46,9 +48,9 @@ export default class GrowiAPI {
 		return response;
 	}
 	async savePageContetnt(page: PageContent) {
-		const response = await this.fetch('pages.update', 'POST', undefined, {
-			page_id: page.id,
-			revision_id: page.revision._id,
+		const response = await this.fetch('page', 'PUT', undefined, {
+			pageId: page._id,
+			revisionId: page.revision._id,
 			body: page.revision.body,
 		});
 		console.log('saveDocumentContetnt response:', response);

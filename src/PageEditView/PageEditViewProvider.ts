@@ -80,7 +80,8 @@ export default class PageEditViewProvider {
 			console.log('dispose EditViewProv'); this.dispose();
 		},
 			null,
-			this.disposables);
+			this.disposables
+		);
 
 		// this.panel.onDidChangeViewState(
 		// 	e => {
@@ -98,6 +99,7 @@ export default class PageEditViewProvider {
 			message => {
 				switch (message.command) {
 					case 'save':
+						this.content = message.body;
 						this.save();
 						break;
 					case 'close':
@@ -109,23 +111,6 @@ export default class PageEditViewProvider {
 			this.disposables
 		);
 	}
-
-	public async save() {
-		if (!this.page) { return; }
-		try {
-			await this.api.savePageContetnt(this.page);
-		} catch (e) {
-			this.panel.webview.postMessage({
-				command: 'saveFailed',
-				message: String(e),
-			});
-			return;
-		}
-		this.panel.webview.postMessage({
-			command: 'saved',
-		});
-	}
-
 	public dispose() {
 		PageEditViewProvider.currentPanel = undefined;
 		// Clean up our resources
@@ -137,6 +122,25 @@ export default class PageEditViewProvider {
 			}
 		}
 	}
+
+	public async save() {
+		if (!this.page) { return; }
+		console.log('PageEditProvider.save', this.page);
+		try {
+			await this.api.savePageContetnt(this.page);
+		} catch (e) {
+			console.dir(e);
+			this.panel.webview.postMessage({
+				command: 'saveFailed',
+				message: (!!e && typeof e === "object" && "message" in e) ? e.message : String(e),
+			});
+			return;
+		}
+		this.panel.webview.postMessage({
+			command: 'saved',
+		});
+	}
+
 
 	private async update(path: string) {
 		this.page = (await this.api.fetchDocumentContent(path)).page;
@@ -177,11 +181,14 @@ export default class PageEditViewProvider {
 				<link href="${faFontUri}" rel="preload" as="font" type="font/woff2">
 				<link href="${faStylesUri}" rel="stylesheet">
 
-				<title>Cat Coding</title>
+				<title>Page Edit</title>
 			</head>
 			<body>
 				<h1>${this.path}</h1>
 				<textarea id='editor'></textarea>
+				<div class='action-area'><button type="button" id="save-button">save</button></div>
+				<div class='message-area'><span id='message'></span></div>
+
 				<textarea id='source'>${this.content}</textarea>
 
 				<script nonce="${nonce}" src="${editorScriptUri}"></script>
