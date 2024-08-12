@@ -34,7 +34,8 @@ export default class PageEditViewProvider {
 			column || vscode.ViewColumn.One,
 			{
 				enableScripts: true,
-				retainContextWhenHidden: true,
+				retainContextWhenHidden: false,
+				localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
 			},
 		);
 		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);

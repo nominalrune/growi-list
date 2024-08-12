@@ -1,5 +1,5 @@
 import { Root } from 'mdast';
-import { window, commands, type ExtensionContext, type WebviewPanel } from 'vscode';
+import { window, commands, Uri, type ExtensionContext, type WebviewPanel } from 'vscode';
 import PageEditViewProvider from './PageEditViewProvider.js';
 import PageItem from '../PageList/PageItem.js';
 import ListItemNode from '../PageContent/ListItemNode.js';
@@ -16,7 +16,7 @@ const showEditViewCommand = (context: ExtensionContext) => {
 			async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any) {
 				console.log(`deserializeWebviewPanel: Got state: ${state}`);
 				// Reset the webview options so we use latest uri for `localResourceRoots`.
-				webviewPanel.webview.options = { enableScripts: true };
+				webviewPanel.webview.options = { enableScripts: true, localResourceRoots: [Uri.joinPath(context.extensionUri, 'media')] };
 				PageEditViewProvider.revive(webviewPanel, context.extensionUri, new PageItem("","",""), context); // FIXME
 			}
 		});
