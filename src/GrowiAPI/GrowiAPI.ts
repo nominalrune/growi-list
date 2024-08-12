@@ -27,9 +27,10 @@ export default class GrowiAPI {
 		}
 		console.log("url", _url.toString());
 		console.log("body", body ? JSON.stringify(body) : undefined);
+		
 		const result = await fetch(_url.toString(), {
 			method: method,
-			...(body ? { body: JSON.stringify(body) } : {})
+			body: body ? JSON.stringify(body) : undefined,
 		});
 		if (!result.ok) {
 			throw new Error(`Fetch error. ${result.status} ${result.statusText}, url:${_url.toString()} | ${await result.text()}`);
@@ -50,8 +51,8 @@ export default class GrowiAPI {
 	async savePageContetnt(page: PageContent) {
 		const response = await this.fetch('page', 'PUT', undefined, {
 			pageId: page._id,
-			revisionId: page.revision._id,
-			body: page.revision.body,
+			revisionId: 0,//page.revision._id,
+			body: "hi"//page.revision.body,
 		});
 		console.log('saveDocumentContetnt response:', response);
 		return response;

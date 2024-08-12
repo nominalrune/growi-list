@@ -34,11 +34,12 @@ export default class PageEditViewProvider {
 		return {
 			enableScripts: true,
 			retainContextWhenHidden: false,
-			localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+			enableForms:true,
+			// localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
 		};
 	};
 
-	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext, channel:vscode.OutputChannel) {
+	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext, channel: vscode.OutputChannel) {
 		channel.appendLine('createOrShow');
 
 		const column = vscode.window.activeTextEditor
@@ -63,12 +64,12 @@ export default class PageEditViewProvider {
 		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context, channel);
 	}
 
-	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext, channel : vscode.OutputChannel) {
+	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext, channel: vscode.OutputChannel) {
 		console.log('revive', context);
 		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context, channel);
 	}
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, public pageItem: PageItem, context: vscode.ExtensionContext, private channel:vscode.OutputChannel) {
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, public pageItem: PageItem, context: vscode.ExtensionContext, private channel: vscode.OutputChannel) {
 		console.log('constructor');
 		this.panel = panel;
 		this.extensionUri = extensionUri;
@@ -77,7 +78,8 @@ export default class PageEditViewProvider {
 
 		// do this when the panel is closed
 		this.panel.onDidDispose(() => {
-			console.log('dispose EditViewProv'); this.dispose();
+			console.log('dispose EditViewProv');
+			this.dispose();
 		},
 			null,
 			this.disposables
@@ -103,7 +105,7 @@ export default class PageEditViewProvider {
 						this.save();
 						break;
 					case 'close':
-						this.dispose()
+						this.dispose();
 						break;
 				}
 			},
