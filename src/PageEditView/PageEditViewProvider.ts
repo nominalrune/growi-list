@@ -30,6 +30,13 @@ export default class PageEditViewProvider {
 			this.page.revision.body = value;
 		}
 	}
+	public static getPanelOptions(extensionUri: vscode.Uri) {
+		return {
+			enableScripts: true,
+			retainContextWhenHidden: false,
+			localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+		};
+	};
 
 	public static createOrShow(extensionUri: vscode.Uri, pageItem: PageItem, context: vscode.ExtensionContext) {
 		console.log('createOrShow');
@@ -51,11 +58,7 @@ export default class PageEditViewProvider {
 			PageEditViewProvider.viewType,
 			'Page Edit',
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				retainContextWhenHidden: false,
-				localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
-			},
+			PageEditViewProvider.getPanelOptions(extensionUri),
 		);
 		PageEditViewProvider.currentPanel = new PageEditViewProvider(panel, extensionUri, pageItem, context);
 	}
@@ -96,7 +99,10 @@ export default class PageEditViewProvider {
 				switch (message.command) {
 					case 'save':
 						this.save();
-						return;
+						break;
+					case 'close':
+						this.dispose()
+						break;
 				}
 			},
 			null,

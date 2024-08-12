@@ -16,7 +16,7 @@ const showEditViewCommand = (context: ExtensionContext) => {
 			async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any) {
 				console.log(`deserializeWebviewPanel: Got state: ${state}`);
 				// Reset the webview options so we use latest uri for `localResourceRoots`.
-				webviewPanel.webview.options = { enableScripts: true, localResourceRoots: [Uri.joinPath(context.extensionUri, 'media')] };
+				webviewPanel.webview.options = PageEditViewProvider.getPanelOptions(Uri.joinPath(context.extensionUri, 'media'));
 				PageEditViewProvider.revive(webviewPanel, context.extensionUri, new PageItem("","",""), context); // FIXME
 			}
 		});
