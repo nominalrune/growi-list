@@ -8,13 +8,16 @@ export default class ListItemNode<T extends ListItem | Root> extends vscode.Tree
 		const collapse = lists.length > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
 		super(content, collapse);
 		this.tooltip = this.id;
-		this.children = node.children.map((node, i) => node.type !== "list" ? [undefined] : node.children.map((li, j) => new ListItemNode(`${id}-${i}-${j}`, li))).flat().filter(i=>i!==undefined);
+		this.children = node.children.map((node, i) => node.type !== "list"
+			? [undefined]
+			: node.children.map((li, j) => new ListItemNode(`${id}-${i}-${j}`, li))
+		).flat().filter(i => i !== undefined);
 		if (node.type === 'listItem') {
 			this.checkboxState = 'checked' in node && node.checked ? vscode.TreeItemCheckboxState.Checked : vscode.TreeItemCheckboxState.Unchecked;
 		}
 	}
 	/** 
-	 * get list's title text. it's in the first node, which is type of paragraph.
+	 * get list's text content. It's in the first node, which is paragraph type.
 	 */
 	static getContent(nodes: Node[]) {
 		const paragraph = nodes.at(0)?.type === 'paragraph' ? nodes.at(0) as Paragraph : null;
@@ -37,7 +40,7 @@ export default class ListItemNode<T extends ListItem | Root> extends vscode.Tree
 				contents.push(node.title);
 			}
 			if (node.type === 'image') {
-				contents.push(`(image:${(node as Image).url})`);
+				contents.push(`[image:${(node as Image).url}]`);
 			}
 			if ('children' in node && Array.isArray(node.children)) {
 				const childContent = ListItemNode.nodesToString(node.children);

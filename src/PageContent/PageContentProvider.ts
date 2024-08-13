@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import ListItemNode from './ListItemNode';
 import GrowiAPI from '../GrowiAPI/GrowiAPI';
-import { ListItem, Root } from 'mdast';
+import { List, ListItem, Node, Root } from 'mdast';
 import MarkdownService from '../MarkdownService';
 import PageContent from '../GrowiAPI/PageContent';
 export default class PageContentProvider implements vscode.TreeDataProvider<ListItemNode<ListItem>> {
@@ -32,10 +32,8 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		this.interval_id = setInterval(() => {
 			this.saveChanges();
 		}, 1500);
-		console.log('DocumentContentProvider created', {
-			api: this.api,
-		});
 	}
+
 	dispose() {
 		this.saveChanges();
 		clearInterval(this.interval_id);
@@ -74,25 +72,33 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 
 		this.content = this.markdown.parse(body);
 		this._onDidChangeTreeData.fire();
-		console.log('content', body, 'parsed', this.content);
 	}
 
 	public async saveChanges() {
 		if (this.hasChanged && !!this.page) {
-			console.log('saveChanges started');
-			await this.api.savePageContetnt(this.page);
+			const result = await this.api.savePageContetnt(this.page);
+			this.page = { ...result.page, revision: result.revision };
+			this.channel.appendLine(`${this.path}: checkboxes saved.`);
 		}
 		this.hasChanged = false;
 	}
 
 	public toggleCheck(node: ListItemNode<ListItem>) {
-		console.log('toggleCheck');
 		if (!this.content) { return; }
-		const route = node.id.split('-');
-		route.shift();
+		const route = node.id.split('-').map(i => Number(i)).filter(item => isFinite(item));
 		const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
-		const toEval = `${route.reduce((acc, path) => `${acc}.children[${path}]`, 'this.content')}.checked = ${checked}`;
-		eval(toEval);
+
+		route.reduce<Root | List | ListItem>((acc, path, i, arr) => {
+			const node = acc.children[path];
+			if (node.type !== 'list' && node.type !== 'listItem') {
+				throw new Error('there should be list or listItem node. ' + node.type + ' type node given.');
+			}
+			if (i === arr.length && node.type === 'listItem') {
+				node.checked = checked;
+				return node;
+			}
+			return node;
+		}, this.content);
 		this.hasChanged = true;
 	}
 }
