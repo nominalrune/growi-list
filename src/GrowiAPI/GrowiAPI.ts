@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import PageListResponse from './PageListResponse';
 import PageContent from './PageContent';
 import { Setting } from '../Setting/Setting';
-import Page from './Page';
 import Revision from './Revision';
 
 export default class GrowiAPI {
@@ -29,8 +28,7 @@ export default class GrowiAPI {
 		}
 
 		const _body = body ? JSON.stringify(body) : undefined;
-		console.log("url", _url.toString());
-		console.log("body", body);
+		this.channel.appendLine("url" + _url.toString());
 
 		const result = await fetch(_url.toString(), {
 			method: method,
@@ -44,24 +42,25 @@ export default class GrowiAPI {
 		}
 		return await result.json() as T;
 	}
+
 	async fetchDocuments() {
 		const result = await this.fetch<PageListResponse>(`pages/recent`, 'GET');
-		// console.log(result);
 		return result.pages;
 	}
+
 	async fetchDocumentContent(path: string) {
-		console.log('fetchDocumentContent, path:', path);
+		this.channel.appendLine('fetchDocumentContent, path:' + path);
 		const encodedPath = encodeURI(path);
 		const response = await this.fetch<{ page: PageContent; }>(`page`, 'GET', { path: encodedPath });
 		return response;
 	}
 	async savePageContetnt(page: PageContent) {
-		const response = await this.fetch<{ page: Omit<PageContent, 'revision'>; revision:Revision }>('page', 'PUT', undefined, {
+		const response = await this.fetch<{ page: Omit<PageContent, 'revision'>; revision: Revision; }>('page', 'PUT', undefined, {
 			pageId: page._id,
 			revisionId: page.revision._id,
 			body: page.revision.body,
 		});
-		console.log('saveDocumentContetnt response:', response);
+		this.channel.appendLine('saveDocumentContetnt response:' + JSON.stringify(response));
 		return response;
 	}
 }
