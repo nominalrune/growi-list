@@ -24,16 +24,22 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 			this.page.revision.body = this.markdown.stringify(value);
 		}
 	}
+	private interval_id: NodeJS.Timeout | undefined;
 	private markdown: MarkdownService;
-	constructor(private context: vscode.ExtensionContext, private channel:vscode.OutputChannel) {
+	constructor(private context: vscode.ExtensionContext, private channel: vscode.OutputChannel) {
 		this.api = new GrowiAPI(this.context, channel);
 		this.markdown = new MarkdownService();
+		this.interval_id = setInterval(() => {
+			this.saveChanges();
+		}, 1500);
 		console.log('DocumentContentProvider created', {
 			api: this.api,
 		});
 	}
 	dispose() {
 		this.saveChanges();
+		clearInterval(this.interval_id);
+		this.interval_id = undefined;
 	}
 
 	getTreeItem(element: ListItemNode<ListItem | Root>): vscode.TreeItem {
@@ -54,11 +60,10 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 	}
 
 	async load(path?: string) {
-		this.channel.appendLine('load: '+path);
+		this.channel.appendLine('load: ' + path);
 		// save changes before loading other document
 		if (this.hasChanged) {
 			await this.saveChanges();
-			this.hasChanged = false;
 		}
 
 		path ??= this.path;
@@ -71,6 +76,7 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		this._onDidChangeTreeData.fire();
 		console.log('content', body, 'parsed', this.content);
 	}
+
 	public async saveChanges() {
 		if (this.hasChanged && !!this.page) {
 			console.log('saveChanges started');
@@ -78,6 +84,7 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		}
 		this.hasChanged = false;
 	}
+
 	public toggleCheck(node: ListItemNode<ListItem>) {
 		console.log('toggleCheck');
 		if (!this.content) { return; }
@@ -85,11 +92,7 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		route.shift();
 		const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
 		const toEval = `${route.reduce((acc, path) => `${acc}.children[${path}]`, 'this.content')}.checked = ${checked}`;
-		console.log({ content: this.content, toEval });
 		eval(toEval);
 		this.hasChanged = true;
-		// this.content.children = this.content.children
-		// .map(n => n.id === node.id ? ({ ...n, checked }) : n);
-		console.log('toggleCheck', node, this.content);
 	}
 }
