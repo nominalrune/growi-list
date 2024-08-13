@@ -13,7 +13,7 @@ export class Setting {
 	private constructor(private context: ExtensionContext) {
 		this.disposables.push(
 			workspace.onDidChangeConfiguration(e => {
-				if (e.affectsConfiguration(`growi-list-view.url`)) this._onDidChange.fire('url');
+				if (e.affectsConfiguration(`growi-todo-list.url`)) this._onDidChange.fire('url');
 			})
 		);
 	}
@@ -21,7 +21,7 @@ export class Setting {
 		this.disposables.forEach(d => d.dispose());
 	}
 	private get config(): WorkspaceConfiguration {
-		return workspace.getConfiguration('growi-list-view');
+		return workspace.getConfiguration('growi-todo-list');
 	}
 	get url(): string {
 		const url = this.config.get<string>('url');
@@ -65,7 +65,7 @@ export class Setting {
 	private async promoteInput(type: 'url' | 'token') {
 		const action = await window.showInformationMessage(`API ${type} not set. Please input your growi ${type}.`, `Input ${type}`);
 		if (action === `Input ${type}`) {
-			return await commands.executeCommand(`growi-list-view.save-${type}`);
+			return await commands.executeCommand(`growi-todo-list.save-${type}`);
 		}
 		throw new Error(`${type} not set.`);
 	}

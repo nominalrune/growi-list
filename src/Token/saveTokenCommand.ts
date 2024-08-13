@@ -1,8 +1,8 @@
 import { commands, window, type ExtensionContext } from 'vscode';
 import { TOKEN_KEY } from '../constants';
 const saveTokenCommand = (context: ExtensionContext) => {
-	const saveCommand = commands.registerCommand('growi-list-view.save-token', () => store(context));
-	const deleteCommand = commands.registerCommand('growi-list-view.delete-token', () => destroy(context));
+	const saveCommand = commands.registerCommand('growi-todo-list.save-token', () => store(context));
+	const deleteCommand = commands.registerCommand('growi-todo-list.delete-token', () => destroy(context));
 	context.subscriptions.push(saveCommand, deleteCommand);
 };
 
@@ -16,7 +16,7 @@ async function store(context: ExtensionContext) {
 		try {
 			await context.secrets.store(TOKEN_KEY, token);
 			window.showInformationMessage('Token saved successfully.');
-			commands.executeCommand('growi-list-view.show-page-list');
+			commands.executeCommand('growi-todo-list.show-page-list');
 		} catch (error) {
 			window.showErrorMessage('Failed to save token.');
 		}

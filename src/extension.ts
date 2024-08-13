@@ -6,7 +6,7 @@ import saveUrlCommand from './Token/saveUrlCommand';
 import showEditViewCommand from './PageEditView/showEditViewCommand';
 
 export function activate(context: ExtensionContext) {
-	const channel = window.createOutputChannel('growi-list-view')
+	const channel = window.createOutputChannel('growi-todo-list')
 	saveUrlCommand(context);
 	saveTokenCommand(context);
 	showPageListCommand(context, channel);

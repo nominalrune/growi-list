@@ -1,12 +1,12 @@
 {
   "name": "growi-todo-list",
-  "displayName": "growi list view",
-  "description": "[unofficial] growi vscode extention",
+  "displayName": "Growi Todo List",
+  "description": "[unofficial] Use Growi Page as Todo List",
   "version": "0.1.0",
   "publisher": "KeiYokoyama",
-  "icon": "resources/icon.png",
+  "icon": "resources/growi-logo.png",
   "repository": {
-    "url": "https://github.com/nominalrune/growi-list-view"
+    "url": "https://github.com/nominalrune/growi-todo-list"
   },
   "engines": {
     "vscode": "^1.91.0"
@@ -18,7 +18,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "growi-list-view.save-token",
+        "command": "growi-todo-list.save-token",
         "title": "Input token",
         "icon": {
           "light": "resources/light/key.svg",
@@ -27,7 +27,7 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.save-url",
+        "command": "growi-todo-list.save-url",
         "title": "Input url",
         "icon": {
           "light": "resources/light/key.svg",
@@ -36,7 +36,7 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.delete-token",
+        "command": "growi-todo-list.delete-token",
         "title": "Delete token",
         "icon": {
           "light": "resources/light/key.svg",
@@ -45,7 +45,7 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.delete-url",
+        "command": "growi-todo-list.delete-url",
         "title": "Delete url",
         "icon": {
           "light": "resources/light/key.svg",
@@ -54,7 +54,7 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.show-page-list",
+        "command": "growi-todo-list.show-page-list",
         "title": "List pages",
         "icon": {
           "light": "resources/light/sync.svg",
@@ -63,7 +63,7 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.show-content",
+        "command": "growi-todo-list.show-content",
         "title": "Show page content",
         "icon": {
           "light": "resources/light/sync.svg",
@@ -72,7 +72,7 @@
         "category": "GrowiList"
       },
       {
-        "command": "growi-list-view.page.edit",
+        "command": "growi-todo-list.page.edit",
         "title": "Edit page content using editor",
         "icon": {
           "light": "resources/light/edit.svg",
@@ -84,42 +84,42 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "growi-list-view.save-token"
+          "command": "growi-todo-list.save-token"
         },
         {
-          "command": "growi-list-view.delete-token"
+          "command": "growi-todo-list.delete-token"
         },
         {
-          "command": "growi-list-view.save-url"
+          "command": "growi-todo-list.save-url"
         },
         {
-          "command": "growi-list-view.delete-url"
+          "command": "growi-todo-list.delete-url"
         },
         {
-          "command": "growi-list-view.show-page-list"
+          "command": "growi-todo-list.show-page-list"
         },
         {
-          "command": "growi-list-view.show-content"
+          "command": "growi-todo-list.show-content"
         },
         {
-          "command": "growi-list-view.page.edit"
+          "command": "growi-todo-list.page.edit"
         }
       ],
       "view/title": [
         {
-          "command": "growi-list-view.show-page-list",
+          "command": "growi-todo-list.show-page-list",
           "when": "view == growi-list-page-list",
           "group": "navigation"
         },
         {
-          "command": "growi-list-view.show-content",
+          "command": "growi-todo-list.show-content",
           "when": "view == growi-list-page-content",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "growi-list-view.page.edit",
+          "command": "growi-todo-list.page.edit",
           "when": "view == growi-list-page-list",
           "group": "inline"
         }
@@ -128,7 +128,7 @@
     "viewsWelcome": [
       {
         "view": "GrowiListPlugin",
-        "contents": "Input your url\n[input](command:growi-list-view.save-url)"
+        "contents": "Input your url\n[input](command:growi-todo-list.save-url)"
       }
     ],
     "viewsContainers": {
@@ -158,7 +158,7 @@
       "type": "object",
       "title": "Growi List View",
       "properties": {
-        "growi-list-view.url": {
+        "growi-todo-list.url": {
           "type": "string",
           "default": null,
           "description": "hosturl of your growi service"

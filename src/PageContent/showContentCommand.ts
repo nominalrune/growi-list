@@ -10,10 +10,10 @@ const showContentCommand = (context: ExtensionContext, channel: OutputChannel) =
 			const item = e.items[0][0];
 			provider.toggleCheck(item as ListItemNode<ListItem>);
 		});
-		const showContentCommand = commands.registerCommand('growi-list-view.show-content', (path?: string) => {
+		const showContentCommand = commands.registerCommand('growi-todo-list.show-content', (path?: string) => {
 			provider.load(path);
 		});
-		// const editCommand = commands.registerCommand('growi-list-view.page.edit', async (node: ListItemNode) => {
+		// const editCommand = commands.registerCommand('growi-todo-list.page.edit', async (node: ListItemNode) => {
 		// 	const content = await window.showInputBox({
 		// 		prompt: 'Edit the content',
 		// 		value: node.label?.toString(),
