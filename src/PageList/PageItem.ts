@@ -9,6 +9,7 @@ export default class PageItem extends vscode.TreeItem {
 			vscode.TreeItemCollapsibleState.None
 		);
 		this.iconPath = vscode.ThemeIcon.File;
+		this.description = path;
 		this.command =  {
 			command: 'growi-todo-list.show-content',
 			title: 'Show Content',
