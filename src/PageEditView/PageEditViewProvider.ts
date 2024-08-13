@@ -129,7 +129,9 @@ export default class PageEditViewProvider {
 		if (!this.page) { return; }
 		console.log('PageEditProvider.save', this.page);
 		try {
-			await this.api.savePageContetnt(this.page);
+			const result = await this.api.savePageContetnt(this.page);
+			console.log(result);
+			this.page = {...result.page, revision: result.revision};
 		} catch (e) {
 			console.dir(e);
 			this.panel.webview.postMessage({

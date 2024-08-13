@@ -9,7 +9,7 @@ type PageContent = Omit<Page, 'revision'>&{
 	parent: string;
 	descendantCount: number;
 	isEmpty: boolean;
-	status: 'published'; // You could use a union type if there are other statuses
+	status: string; // You could use a union type if there are other statuses
 	grant: number;
 	grantedUsers: string[]; // Assuming it's an array of user IDs
 	liker: string[]; // Assuming it's an array of user IDs

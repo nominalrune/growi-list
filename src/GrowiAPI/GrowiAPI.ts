@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import PageListResponse from './PageListResponse';
 import PageContent from './PageContent';
 import { Setting } from '../Setting/Setting';
+import Page from './Page';
+import Revision from './Revision';
 
 export default class GrowiAPI {
 	private setting: { url: string, token: string; } | undefined;
@@ -25,12 +27,17 @@ export default class GrowiAPI {
 				_url.searchParams.set(k, v);
 			});
 		}
+
+		const _body = body ? JSON.stringify(body) : undefined;
 		console.log("url", _url.toString());
-		console.log("body", body ? JSON.stringify(body) : undefined);
-		
+		console.log("body", body);
+
 		const result = await fetch(_url.toString(), {
 			method: method,
-			body: body ? JSON.stringify(body) : undefined,
+			body: _body,
+			headers: {
+				'Content-Type': "application/json",
+			}
 		});
 		if (!result.ok) {
 			throw new Error(`Fetch error. ${result.status} ${result.statusText}, url:${_url.toString()} | ${await result.text()}`);
@@ -49,10 +56,10 @@ export default class GrowiAPI {
 		return response;
 	}
 	async savePageContetnt(page: PageContent) {
-		const response = await this.fetch('page', 'PUT', undefined, {
+		const response = await this.fetch<{ page: Omit<PageContent, 'revision'>; revision:Revision }>('page', 'PUT', undefined, {
 			pageId: page._id,
-			revisionId: 0,//page.revision._id,
-			body: "hi"//page.revision.body,
+			revisionId: page.revision._id,
+			body: page.revision.body,
 		});
 		console.log('saveDocumentContetnt response:', response);
 		return response;
