@@ -17,6 +17,12 @@ saveButton?.addEventListener('click', () => {
 		body: simpleMde.value()
 	});
 });
+const closeButton = document.getElementById('close-button');
+closeButton?.addEventListener('click', () => {
+	vscode.postMessage({
+		command: 'close'
+	});
+});
 window.addEventListener('message', event => {
 	const message = event.data;
 	switch (message.command) {

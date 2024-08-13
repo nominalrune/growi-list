@@ -1,30 +1,32 @@
-# Dynalist Simple Plugin
+# Growi Todo List
+[日本語](#日本語)
 
-The Dynalist Simple Plugin allows you to integrate your Dynalist documents into Visual Studio Code. This plugin provides a convenient way to view, and edit your Dynalist documents without leaving your coding environment.
+The Growi Todo List allows you to integrate your Growi Pages into Visual Studio Code. This plugin selectively shows only lists. They're rendered as a check list. As a supplemental feature, offers editor to show and edit the whole page as well.
 Note that this is unofficial plugin.
 
 ## Features
-![screenshot](resources/plugin-screenshot.png)
-- **View Document List:** Display a tree view of your Dynalist documents and folders in the sidebar.
-- **View Document Content:** Click on a document to fetch and display its content.
-- **Context Menu Commands:** Right-click on document content items to:
-  - Insert new nodes
-  - Indent or outdent nodes
-  - Delete nodes
-
+- List Recent Pages
+   - ![](resources/plugin-screenshot01.png)
+   - Run the command `GrowiTodoList: List pages` via the Command Palette (`Ctrl+Shift+P`).
+   - Your Growi pages will appear in the sidebar under the "GrowiTodoList" section.
+- Show Todo list
+   - Click the page title in List view.
+   - Your Growi page will appear in the sidebar under the "GrowiTodoList" section.
+   - You can check or uncheck list items.
+- View/Edit Page Content
+   - ![](resources/plugin-screenshot02.png)
+   - Click edit icon on any page in the sidebar to edit its content in the editor.
 ## Getting Started
 
+1. **Input Your Site Url:**
+   - Get your site's url.
+   - When the plugin is activated, it will prompt you to enter your site url if not already saved.
+   - You can also manually run the command `GrowiTodoList: Save url` via the Command Palette (`Ctrl+Shift+P`).
+   
 1. **Input Your API Token:**
-   - Get your API token via [dynalist's developper page](https://dynalist.io/developer).
-   - When the plugin is activated, it will prompt you to enter your Dynalist API token if not already saved.
-   - You can also manually run the command `Dynalist: Update API Token` via the Command Palette (`Ctrl+Shift+P`).
-
-2. **View Document List:**
-   - Run the command `Dynalist: Show Document List` via the Command Palette (`Ctrl+Shift+P`).
-   - Your Dynalist documents and folders will appear in the sidebar under the "Dynalist" section.
-
-3. **View/Edit Document Content:**
-   - Click on any document in the sidebar to load its content in the "Document Content" panel.
+   - Get your API token.
+   - When the plugin is activated, it will prompt you to enter your Growi API token if not already saved.
+   - You can also manually run the command `GrowiTodoList: Save API Token` via the Command Palette (`Ctrl+Shift+P`).
 
 ## License
 
@@ -32,5 +34,24 @@ This project is licensed under the MIT License.
 
 ## Acknowledgements
 
-- [Dynalist API Documentation](https://apidocs.dynalist.io/) for providing the API reference.
 - [Visual Studio Code Extension API](https://code.visualstudio.com/api) for the development guidelines.
+
+
+# 日本語
+Growi Todo List を使うと、Growi ページを Visual Studio Code に統合することができます。このプラグインはページ内のリスト形式のデータのみを取得して、todoリストとして表示します。おまけ機能として、ページ全体を表示・編集するエディタもあります。
+非公式・個人提供のプラグインです。
+
+## 機能
+- 最近のページ一覧
+   - ![](resources/plugin-screenshot01.png)
+- Todoリストの表示
+- ページ内容の表示/編集
+   - ![](resources/plugin-screenshot02.png)
+## セットアップ
+1. サイトURLの入力
+   - プラグインが有効化されると、サイトのURLを入力するプロンプトが表示されます。ご使用のGrowiのサイトアドレスを入力してください。
+   - 手動でコマンドパレットから `GrowiTodoList： コマンドパレット`(`Ctrl+Shift+P`)から手動で`GrowiTodoList: Save url`コマンドを実行することもできます。
+   
+1. API トークンを入力
+   - Growiのユーザーページから、APIトークンを取得します。
+   - `GrowiTodoList： コマンドパレット (`Ctrl+Shift+P`) を使って `GrowiTodoList: Save API Token` コマンドを実行し、APIトークンを入力してください。

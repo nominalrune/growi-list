@@ -190,7 +190,10 @@ export default class PageEditViewProvider {
 			<body>
 				<h1>${this.path}</h1>
 				<textarea id='editor'></textarea>
-				<div class='action-area'><button type="button" id="save-button">save</button></div>
+				<div class='action-area'>
+					<button type="button" id="close-button">close</button>
+					<button type="button" id="save-button">save</button>
+				</div>
 				<div class='message-area'><span id='message'></span></div>
 
 				<textarea id='source'>${this.content}</textarea>
