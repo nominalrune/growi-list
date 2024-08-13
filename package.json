@@ -2,7 +2,7 @@
   "name": "growi-todo-list",
   "displayName": "Growi Todo List",
   "description": "[unofficial] Use Growi Page as Todo List",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "KeiYokoyama",
   "icon": "resources/growi-logo.png",
   "repository": {
@@ -24,7 +24,7 @@
           "light": "resources/light/key.svg",
           "dark": "resources/dark/key.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       },
       {
         "command": "growi-todo-list.save-url",
@@ -33,7 +33,7 @@
           "light": "resources/light/key.svg",
           "dark": "resources/dark/key.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       },
       {
         "command": "growi-todo-list.delete-token",
@@ -42,7 +42,7 @@
           "light": "resources/light/key.svg",
           "dark": "resources/dark/key.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       },
       {
         "command": "growi-todo-list.delete-url",
@@ -51,7 +51,7 @@
           "light": "resources/light/key.svg",
           "dark": "resources/dark/key.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       },
       {
         "command": "growi-todo-list.show-page-list",
@@ -60,7 +60,7 @@
           "light": "resources/light/sync.svg",
           "dark": "resources/dark/sync.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       },
       {
         "command": "growi-todo-list.show-content",
@@ -69,7 +69,7 @@
           "light": "resources/light/sync.svg",
           "dark": "resources/dark/sync.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       },
       {
         "command": "growi-todo-list.page.edit",
@@ -78,7 +78,7 @@
           "light": "resources/light/edit.svg",
           "dark": "resources/dark/edit.svg"
         },
-        "category": "GrowiList"
+        "category": "GrowiTodoList"
       }
     ],
     "menus": {
@@ -127,29 +127,29 @@
     },
     "viewsWelcome": [
       {
-        "view": "GrowiListPlugin",
+        "view": "GrowiTodoListPlugin",
         "contents": "Input your url\n[input](command:growi-todo-list.save-url)"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "GrowiListPlugin",
-          "title": "GrowiList",
+          "id": "GrowiTodoListPlugin",
+          "title": "GrowiTodoList",
           "icon": "resources/growi-logo.svg"
         }
       ]
     },
     "views": {
-      "GrowiListPlugin": [
+      "GrowiTodoListPlugin": [
         {
           "id": "growi-list-page-list",
-          "name": "GrowiList - pages",
+          "name": "GrowiTodoList - pages",
           "icon": "resources/growi-logo.svg"
         },
         {
           "id": "growi-list-page-content",
-          "name": "GrowiList - Content",
+          "name": "GrowiTodoList - Content",
           "icon": "resources/growi-logo.svg"
         }
       ]
