@@ -34,7 +34,7 @@ export default class PageEditViewProvider {
 		return {
 			enableScripts: true,
 			retainContextWhenHidden: false,
-			enableForms:true,
+			enableForms: true,
 			// localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
 		};
 	};
@@ -48,7 +48,7 @@ export default class PageEditViewProvider {
 
 		// If we already have a panel, show it.
 		if (PageEditViewProvider.currentPanel) {
-			PageEditViewProvider.currentPanel.update(pageItem.path).then(() => {
+			PageEditViewProvider.currentPanel.refresh(pageItem.path).then(() => {
 				PageEditViewProvider.currentPanel?.panel.reveal(column);
 			});
 			return;
@@ -74,7 +74,7 @@ export default class PageEditViewProvider {
 		this.panel = panel;
 		this.extensionUri = extensionUri;
 		this.api = new GrowiAPI(context, channel);
-		this.update(pageItem.path);
+		this.refresh(pageItem.path);
 
 		// do this when the panel is closed
 		this.panel.onDidDispose(() => {
@@ -114,6 +114,7 @@ export default class PageEditViewProvider {
 		);
 	}
 	public dispose() {
+		this.save();
 		PageEditViewProvider.currentPanel = undefined;
 		// Clean up our resources
 		this.panel.dispose();
@@ -127,11 +128,11 @@ export default class PageEditViewProvider {
 
 	public async save() {
 		if (!this.page) { return; }
-		console.log('PageEditProvider.save', this.page);
+		this.channel.appendLine('PageEditProvider.save' + JSON.stringify(this.page));
 		try {
 			const result = await this.api.savePageContetnt(this.page);
 			console.log(result);
-			this.page = {...result.page, revision: result.revision};
+			this.page = { ...result.page, revision: result.revision };
 		} catch (e) {
 			console.dir(e);
 			this.panel.webview.postMessage({
@@ -146,7 +147,8 @@ export default class PageEditViewProvider {
 	}
 
 
-	private async update(path: string) {
+	private async refresh(path: string) {
+		await this.save();
 		this.page = (await this.api.fetchDocumentContent(path)).page;
 	};
 

@@ -8,8 +8,8 @@ import remarkGfm from 'remark-gfm';
 // @ts-expect-error esm module error
 import remarkStringify from 'remark-stringify';
 import { Root } from 'mdast';
-export default class MarkdownService{
-	public stringify(root:Root) {
+export default class MarkdownService {
+	public stringify(root: Root) {
 		const content = unified()
 			.use(remarkGfm)
 			.use(remarkStringify, {
@@ -19,6 +19,7 @@ export default class MarkdownService{
 				rule: '-',
 			})
 			.stringify(root);
+		console.log('MarkdownService::stringify, root:', root, "result", content);
 		return content;
 	}
 	public parse(body: string) {

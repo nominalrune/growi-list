@@ -2,7 +2,7 @@
   "name": "growi-todo-list",
   "displayName": "Growi Todo List",
   "description": "[unofficial] Use Growi Page as Todo List",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "KeiYokoyama",
   "icon": "resources/growi-logo.png",
   "repository": {

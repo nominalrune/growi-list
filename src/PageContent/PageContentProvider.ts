@@ -19,6 +19,7 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		return this.#content;
 	}
 	private set content(value: Root | undefined) {
+		this.hasChanged = true;
 		this.#content = value;
 		if (this.page && value) {
 			this.page.revision.body = this.markdown.stringify(value);
@@ -30,8 +31,9 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		this.api = new GrowiAPI(this.context, channel);
 		this.markdown = new MarkdownService();
 		this.interval_id = setInterval(() => {
+			console.log("interval");
 			this.saveChanges();
-		}, 1500);
+		}, 5000);
 	}
 
 	dispose() {
@@ -76,6 +78,7 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 
 	public async saveChanges() {
 		if (this.hasChanged && !!this.page) {
+			console.log('saving current page.');
 			const result = await this.api.savePageContetnt(this.page);
 			this.page = { ...result.page, revision: result.revision };
 			this.channel.appendLine(`${this.path}: checkboxes saved.`);
@@ -88,17 +91,9 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		const route = node.id.split('-').map(i => Number(i)).filter(item => isFinite(item));
 		const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
 
-		route.reduce<Root | List | ListItem>((acc, path, i, arr) => {
-			const node = acc.children[path];
-			if (node.type !== 'list' && node.type !== 'listItem') {
-				throw new Error('there should be list or listItem node. ' + node.type + ' type node given.');
-			}
-			if (i === arr.length && node.type === 'listItem') {
-				node.checked = checked;
-				return node;
-			}
-			return node;
-		}, this.content);
+		const toEval = `${route.reduce((acc, path) => `${acc}.children[${path}]`, 'this.content')}.checked = ${checked}`;
+		eval(toEval);
 		this.hasChanged = true;
+		console.log("checkbox change", this.content);
 	}
 }

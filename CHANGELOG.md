@@ -4,6 +4,9 @@ All notable changes to the "dynalist-plugin" extension will be documented in thi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.4]
+### Fixed
+- Fix degration of saving feature
 ## [0.1.3]
 ### Changed
 - change icon
