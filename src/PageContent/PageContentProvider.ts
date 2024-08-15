@@ -90,10 +90,11 @@ export default class PageContentProvider implements vscode.TreeDataProvider<List
 		if (!this.content) { return; }
 		const route = node.id.split('-').map(i => Number(i)).filter(item => isFinite(item));
 		const checked = node.checkboxState === vscode.TreeItemCheckboxState.Checked ? true : false;
+		const content = {...this.content};
 
-		const toEval = `${route.reduce((acc, path) => `${acc}.children[${path}]`, 'this.content')}.checked = ${checked}`;
+		const toEval = `${route.reduce((acc, path) => `${acc}.children[${path}]`, 'content')}.checked = ${checked}`;
 		eval(toEval);
-		this.hasChanged = true;
+		this.content = content;
 		console.log("checkbox change", this.content);
 	}
 }
