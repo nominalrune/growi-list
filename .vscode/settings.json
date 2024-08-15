@@ -15,5 +15,6 @@
         "growi",
         "mdast",
         "simplemde"
-    ]
+    ],
+    "svg.preview.background": "editor"
 }
