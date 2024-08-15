@@ -2,7 +2,7 @@
   "name": "growi-todo-list",
   "displayName": "Growi Todo List",
   "description": "[unofficial] Use Growi Page as Todo List",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "KeiYokoyama",
   "icon": "resources/growi-logo.png",
   "repository": {
@@ -135,7 +135,7 @@
       "activitybar": [
         {
           "id": "GrowiTodoListPlugin",
-          "title": "GrowiTodoList",
+          "title": "Growi Todo List",
           "icon": "resources/growi-logo.svg"
         }
       ]
@@ -144,19 +144,19 @@
       "GrowiTodoListPlugin": [
         {
           "id": "growi-list-page-list",
-          "name": "GrowiTodoList - pages",
+          "name": "Growi - Recent Pages",
           "icon": "resources/growi-logo.svg"
         },
         {
           "id": "growi-list-page-content",
-          "name": "GrowiTodoList - Content",
+          "name": "Growi - Show Check List",
           "icon": "resources/growi-logo.svg"
         }
       ]
     },
     "configuration": {
       "type": "object",
-      "title": "Growi List View",
+      "title": "Growi Todo List",
       "properties": {
         "growi-todo-list.url": {
           "type": "string",

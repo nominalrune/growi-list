@@ -38,15 +38,24 @@ This project is licensed under the MIT License.
 
 
 # 日本語
-Growi Todo List を使うと、Growi ページを Visual Studio Code に統合することができます。このプラグインはページ内のリスト形式のデータのみを取得して、todoリストとして表示します。おまけ機能として、ページ全体を表示・編集するエディタもあります。
+Growi Todo List は、GrowiページをVScodeで表示するプラグインです。
+マークダウンからリストのみを取得して、todoリストとして表示します。
+
+おまけ機能として、ページ全体を表示・編集するエディタもあります。
+
 非公式・個人提供のプラグインです。
 
 ## 機能
 - 最近のページ一覧
    - ![](resources/plugin-screenshot01.png)
+   - 最近の更新記事を取得してタイトルを表示します
 - Todoリストの表示
-- ページ内容の表示/編集
    - ![](resources/plugin-screenshot02.png)
+   - 記事タイトルを選択すると、ContentペインにTodoリストが表示されます
+- ページ内容の表示/編集
+   - ![](resources/plugin-screenshot03.png)
+   - ページ一覧ペインにて、✏️マークをクリックすると、当該記事のマークダウン編集が可能です。
+
 ## セットアップ
 1. サイトURLの入力
    - プラグインが有効化されると、サイトのURLを入力するプロンプトが表示されます。ご使用のGrowiのサイトアドレスを入力してください。

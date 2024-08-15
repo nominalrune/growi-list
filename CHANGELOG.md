@@ -4,11 +4,14 @@ All notable changes to the "dynalist-plugin" extension will be documented in thi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.1.2]
+## [0.1.3]
+### Changed
+- change icon
+- improve README.md
 
+## [0.1.2]
 ### Fixed
 - Fix autosaving checkbox state
-
 ### Changed
 - improved security (removal of eval execution)
 
